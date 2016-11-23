@@ -115,6 +115,7 @@ public class ClusterLayerOptions {
         ClusterImage = clusterImage;
     }
 
+    @Deprecated()
     public Image getSingleImage() {
         return SingleImage;
     }
@@ -123,6 +124,7 @@ public class ClusterLayerOptions {
      * 设置聚合散开点图片路径和图片大小
      * @param singleImage
      */
+    @Deprecated()
     public void setSingleImage(Image singleImage) {
         SingleImage = singleImage;
     }

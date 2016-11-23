@@ -1,7 +1,7 @@
 package com.netposa.npmobilesdk.geometry;
 
 /**
- * @breif 标注属性
+ *  标注属性
  */
 public class MarkerOptions {
     private String externalGraphic;

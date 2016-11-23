@@ -76,10 +76,17 @@ public class NetPosaMap extends Entity {
         webView.registerHandler("NPMobileHelper.Event.Call", new BridgeHandler() {
             @Override
             public void handler(String data, CallBackFunction function) {
-                EventCallBackArgs e = com.alibaba.fastjson.JSON.parseObject(data, EventCallBackArgs.class);
+                EventCallBackArgs e = null;
+                try {
+                    e = com.alibaba.fastjson.JSON.parseObject(data, EventCallBackArgs.class);
+                } catch (Exception ex) {
+
+                }
                 if (e != null) {
                     Entity entity = Util.getEntity(e.getId());
                     entity.processEvent(e.getEventType(), e.getArgs());
+                } else {
+
                 }
             }
         });
@@ -282,5 +289,25 @@ public class NetPosaMap extends Entity {
         this.ExecuteJs("destroy");
         this.webView.getSettings().setJavaScriptEnabled(false);
         Util.clearAllEntity();
+    }
+
+    /**
+     * 计算两点距离 单位米
+     *
+     * @param p0
+     * @param p1
+     * @param callBackFunction
+     */
+    public void getDistance(Point p0, Point p1, NPCallBackFunction<Double> callBackFunction) {
+        final NPCallBackFunction<Double> temp = callBackFunction;
+        this.ExecuteJs(this, "distance", new CallBackFunction() {
+            public void onCallBack(String data) {
+                if (!Util.isEmpty(data)) {
+                    if (temp != null) {
+                        temp.onCallBack(Double.parseDouble(data));
+                    }
+                }
+            }
+        }, p0, p1);
     }
 }

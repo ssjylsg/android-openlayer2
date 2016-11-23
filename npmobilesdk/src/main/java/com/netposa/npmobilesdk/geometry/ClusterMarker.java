@@ -5,6 +5,7 @@ import com.netposa.npmobilesdk.Entity;
 import com.netposa.npmobilesdk.event.NPEventListener;
 import com.netposa.npmobilesdk.layer.Layer;
 import com.netposa.npmobilesdk.map.NetPosaMap;
+import com.netposa.npmobilesdk.utils.Image;
 
 /**
  * 聚合Marker
@@ -13,14 +14,17 @@ import com.netposa.npmobilesdk.map.NetPosaMap;
 public class ClusterMarker extends Entity {
     private Point point;
     private Layer layer;
+    private Image image;
 
     /**
      * 聚合Marker
      * @param point
+     * @param image
      */
-    public ClusterMarker(Point point) {
+    public ClusterMarker(Point point,Image image) {
         this.setClassName("NPMobile.Geometry.ClusterMarker");
         this.setPoint(point);
+        this.setImage(image);
     }
 
     public void setLayer(Layer layer) {
@@ -60,5 +64,17 @@ public class ClusterMarker extends Entity {
         if (map != null) {
             map.ExecuteJs(this, "changeStyle", options);
         }
+    }
+
+    public Image getImage() {
+        return image;
+    }
+
+    /**
+     * 设置散开之后的图片
+     * @param image
+     */
+    public void setImage(Image image) {
+        this.image = image;
     }
 }
