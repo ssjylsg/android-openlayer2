@@ -8,6 +8,7 @@ import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.netposa.npmobilesdk.NPCallBackFunction;
 import com.netposa.npmobilesdk.common.Constants;
@@ -21,6 +22,7 @@ import com.netposa.npmobilesdk.geometry.Point;
 import com.netposa.npmobilesdk.jsbridge.BridgeWebView;
 import com.netposa.npmobilesdk.layer.ClusterLayer;
 import com.netposa.npmobilesdk.layer.ClusterLayerOptions;
+import com.netposa.npmobilesdk.layer.ClusterStatisticInfo;
 import com.netposa.npmobilesdk.layer.CustomerLayer;
 import com.netposa.npmobilesdk.map.NetPosaMap;
 import com.netposa.npmobilesdk.tool.Measure;
@@ -73,6 +75,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         layer = new CustomerLayer("测试");
         // 将图层添加到地图
         map.addLayer(layer);
+
+        map.addEventListener(Constants.MAP_ScaleLine, new NPEventListener() {
+            @Override
+            public void processEvent(EventObject sender, EventArgs e) {
+                Object[] temp = (Object[]) e.getArgs();
+                String info = temp[0].toString() + " " + temp[1].toString();
+                Util.Info("MAP", info);
+                final String tempInfo = info;
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((Button) (findViewById(R.id.add_btn))).setText(tempInfo);
+                    }
+                });
+//                ((EditText)findViewById(R.id.editText)).setText(info);
+            }
+        });
     }
 
     @Override
@@ -104,45 +123,61 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void testAddClusterMarker() {
-        ClusterLayerOptions options = new ClusterLayerOptions();
-        options.setClusterImage(new Image("img/Flag.png", new Size(32, 32)));
-        // options.setSingleImage(new Image("img/marker.png", new Size(21, 25)));
-        ClusterLayer clusterLayer = new ClusterLayer("聚合图层测试", options);
-        this.map.addLayer(clusterLayer);
         double lon = 116.3427702718185;
         double lat = 39.89369592052587;
 
+        ClusterLayerOptions options = new ClusterLayerOptions();
+        options.setFontColor("#000000");
+        options.setFontSize("23px");
+        options.setClusterImage(new Image("img/Flag.png", new Size(32, 32)));
+        List<ClusterStatisticInfo> statisticInfos = new ArrayList<>();
+        statisticInfos.add(new ClusterStatisticInfo(lon, lat, "50"));
+//        options.setStatistics(statisticInfos);
+        options.setMinZoom(6);
+        // options.setSingleImage(new Image("img/marker.png", new Size(21, 25)));
+        ClusterLayer clusterLayer = new ClusterLayer("聚合图层测试", options);
+        this.map.addLayer(clusterLayer);
+
+
         ArrayList<ClusterMarker> markers = new ArrayList<>();
         Image image = new Image("img/marker.png", new Size(21, 25));
-        for (Integer i = 0; i < 10; i++) {
+        for (Integer i = 0; i < 30000; i++) {
             markers.add(new ClusterMarker(new Point(lon + Math.random() * Math.pow(-1, i) * 0.1,
                     lat + Math.random() * Math.pow(-1, i + 1) * 0.1), image));
+            if( i!=0 && i%5000 == 0) {
+                clusterLayer.addClusterMarkers(markers,false);
+                markers = new ArrayList<>();
+            }
+            if(i == 30000-1){
+                clusterLayer.addClusterMarkers(markers, true);
+            }
         }
-        clusterLayer.addClusterMarkers(markers);
+      //  clusterLayer.addClusterMarkers(markers,true);
+
 
 
         clusterLayer.addEventListener(Constants.EVENT_TYPE_CLICK, new NPEventListener<ClusterMarker>() {
             @Override
             public void processEvent(EventObject<ClusterMarker> sender, EventArgs e) {
 
-                final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("聚合事件").setMessage(sender.getSource().getPoint().toString()).show();
-
-                // 获取当前缩放等级
-                map.getZoom(new NPCallBackFunction<Integer>() {
-                    @Override
-                    public void onCallBack(Integer data) {
-                        Util.Info("getZoom", "ok");
-                    }
-                });
-                // 获取当前中心点
-                map.getCenter(new NPCallBackFunction<Point>() {
-                    @Override
-                    public void onCallBack(Point data) {
-
-                    }
-                });
-                map.setCenter(sender.getSource().getPoint());
+//                final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+//                builder.setTitle("聚合事件").setMessage(sender.getSource().getPoint().toString()).show();
+//
+//                // 获取当前缩放等级
+//                map.getZoom(new NPCallBackFunction<Integer>() {
+//                    @Override
+//                    public void onCallBack(Integer data) {
+//                        Util.Info("getZoom", "ok");
+//                    }
+//                });
+//                // 获取当前中心点
+//                map.getCenter(new NPCallBackFunction<Point>() {
+//                    @Override
+//                    public void onCallBack(Point data) {
+//
+//                    }
+//                });
+//                map.setCenter(sender.getSource().getPoint());
                 sender.getSource().changeStyle(new MarkerStyle("img/Flag.png", 21.0, 25.0));
             }
         });
@@ -157,9 +192,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.add_btn:
-                // addMarker();
+                 addMarker();
                 // testMeasure();
-                testGeocoderHelper();
+                //testGeocoderHelper();
                 break;
             case R.id.add_cluster_btn:
                 testAddClusterMarker();

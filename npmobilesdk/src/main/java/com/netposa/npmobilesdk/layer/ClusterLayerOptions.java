@@ -4,6 +4,8 @@ package com.netposa.npmobilesdk.layer;
 import com.netposa.npmobilesdk.utils.Image;
 import com.netposa.npmobilesdk.utils.Size;
 
+import java.util.List;
+
 /**
  * 聚合图层参数配置
  */
@@ -21,7 +23,7 @@ public class ClusterLayerOptions {
     private Size customLabelOffset;
     private Image ClusterImage;
     private Image SingleImage;
-
+    private List<ClusterStatisticInfo> statistics;
 
     public int getSelectZoom() {
         return selectZoom;
@@ -109,6 +111,7 @@ public class ClusterLayerOptions {
 
     /**
      * 设置聚合图片路径和图片大小
+     *
      * @param clusterImage
      */
     public void setClusterImage(Image clusterImage) {
@@ -122,10 +125,23 @@ public class ClusterLayerOptions {
 
     /**
      * 设置聚合散开点图片路径和图片大小
+     *
      * @param singleImage
      */
     @Deprecated()
     public void setSingleImage(Image singleImage) {
         SingleImage = singleImage;
+    }
+
+    public List<ClusterStatisticInfo> getStatistics() {
+        return statistics;
+    }
+
+    /**
+     * 设置统计信息
+     * @param statistics
+     */
+    public void setStatistics(List<ClusterStatisticInfo> statistics) {
+        this.statistics = statistics;
     }
 }

@@ -31,12 +31,13 @@ public class ClusterLayer extends Layer {
     /**
      * 新增聚合Marker
      * @param clusterMarkers
+     * @param isComplete 聚合新增是否结束。由于webview 传输限制，聚合每5K组数据传输一次。
      */
-    public void addClusterMarkers(ArrayList<ClusterMarker> clusterMarkers) {
+    public void addClusterMarkers(ArrayList<ClusterMarker> clusterMarkers,boolean isComplete) {
         for (int i = 0; i < clusterMarkers.size(); i++) {
             clusterMarkers.get(i).setLayer(this);
         }
-        this.ExecuteJs("addOverlays", clusterMarkers);
+        this.ExecuteJs("addOverlays", clusterMarkers,isComplete);
     }
 
     @Override

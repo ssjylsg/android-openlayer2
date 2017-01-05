@@ -67,6 +67,9 @@ public abstract class Entity {
      * @param args 事件参数
      */
     public void processEvent(String event, Object... args) {
-        this.events.get(event).processEvent(new EventObject(this), new EventArgs(args));
+        NPEventListener e = this.events.get(event);
+        if(e != null){
+            e.processEvent(new EventObject(this), new EventArgs(args));
+        }
     }
 }

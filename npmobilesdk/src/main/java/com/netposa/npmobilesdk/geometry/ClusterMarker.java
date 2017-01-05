@@ -22,7 +22,7 @@ public class ClusterMarker extends Entity {
      * @param image
      */
     public ClusterMarker(Point point,Image image) {
-        this.setClassName("NPMobile.Geometry.ClusterMarker");
+        this.setClassName("_CM");
         this.setPoint(point);
         this.setImage(image);
     }

@@ -23,9 +23,20 @@
             android:layout_weight="1"
             android:text="添加聚合点位"
             android:layout_height="match_parent" />
+        <!--<EditText-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:inputType="textPersonName"-->
+            <!--android:text="Name"-->
+            <!--android:ems="10"-->
+
+            <!--android:layout_x="266dp"-->
+            <!--android:layout_y="9dp"-->
+            <!--android:id="@+id/editText" />-->
     </LinearLayout>
     <com.netposa.npmobilesdk.jsbridge.BridgeWebView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/webView" />
+        android:id="@+id/webView" >
+    </com.netposa.npmobilesdk.jsbridge.BridgeWebView>
 </LinearLayout>

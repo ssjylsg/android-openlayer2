@@ -17,4 +17,9 @@ public class Constants {
      * 面积测量
      */
     public static final String MeasureMode_AREA = "Polygon";
+
+    /**
+     * 地图比例尺回调事件
+     */
+    public static  final  String MAP_ScaleLine = "ScaleLine";
 }

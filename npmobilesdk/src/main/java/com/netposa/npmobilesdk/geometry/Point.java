@@ -12,7 +12,8 @@ public class Point extends Entity {
     private double lat = 0.0;
 
     public Point() {
-        this.setClassName("NPMobile.Geometry.Point");
+        this.setClassName("P");
+        this.setId("");
     }
 
     /**

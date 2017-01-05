@@ -1,5 +1,6 @@
 package com.netposa.npmobilesdk.map;
 
+import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 
 import com.alibaba.fastjson.annotation.JSONField;
@@ -9,6 +10,7 @@ import com.netposa.npmobilesdk.NPWebViewClient;
 import com.netposa.npmobilesdk.SimpleJavaJSWebChromeClient;
 import com.netposa.npmobilesdk.event.EventCallBackArgs;
 import com.netposa.npmobilesdk.event.EventManager;
+import com.netposa.npmobilesdk.event.NPEventListener;
 import com.netposa.npmobilesdk.geometry.Point;
 import com.netposa.npmobilesdk.jsbridge.BridgeHandler;
 import com.netposa.npmobilesdk.jsbridge.BridgeWebView;
@@ -84,14 +86,54 @@ public class NetPosaMap extends Entity {
                 }
                 if (e != null) {
                     Entity entity = Util.getEntity(e.getId());
-                    entity.processEvent(e.getEventType(), e.getArgs());
+                    if (entity != null) {
+                        entity.processEvent(e.getEventType(), e.getArgs());
+                    }
                 } else {
 
                 }
             }
         });
-    }
 
+
+//        webView.registerHandler("NPMobileHelper.ScaleLine", new BridgeHandler() {
+//            @Override
+//            public void handler(String data, CallBackFunction function) {
+//                com.alibaba.fastjson.JSONObject jsonObject = com.alibaba.fastjson.JSON.parseObject(data);
+//
+//                Entity entity = Util.getEntity(jsonObject.getString("id"));
+//                if (entity != null) {
+//                    entity.processEvent(jsonObject.getString("eventType"),
+//                            jsonObject.getString("width"), jsonObject.getString("content"));
+//                }
+//
+//                //this.processEvent("ScaleLine",data );
+//
+////                NPEventListener e = this.events.get(event);
+////                if(e != null){
+////                    e.processEvent(new EventObject(this), new EventArgs(args));
+////                }
+//            }
+//        });
+
+        webView.addJavascriptInterface(new JavaScriptObject (this),"ScaleLineHelper");
+    }
+    class  JavaScriptObject{
+        private  NetPosaMap map;
+        public JavaScriptObject(NetPosaMap map){
+            this.map = map;
+        }
+        @JavascriptInterface
+        public void ScaleLine(String data){
+            com.alibaba.fastjson.JSONObject jsonObject = com.alibaba.fastjson.JSON.parseObject(data);
+
+            Entity entity = Util.getEntity(jsonObject.getString("id"));
+            if (entity != null) {
+                entity.processEvent(jsonObject.getString("eventType"),
+                        jsonObject.getString("width"), jsonObject.getString("content"));
+            }
+        }
+    };
     public void CreateMap() {
         if (isMapavaild) {
             return;
@@ -309,5 +351,17 @@ public class NetPosaMap extends Entity {
                 }
             }
         }, p0, p1);
+    }
+
+    public void addEventListener(String type, NPEventListener eventListener) {
+        this.events.put(type, eventListener);
+    }
+
+    /**
+     * 平移地图
+     * @param point
+     */
+    public void panTo(Point point){
+        this.ExecuteJs(this,"panTo",point);
     }
 }
