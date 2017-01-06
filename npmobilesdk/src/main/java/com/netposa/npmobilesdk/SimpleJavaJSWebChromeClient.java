@@ -10,7 +10,7 @@ import com.netposa.npmobilesdk.map.NetPosaMap;
 import com.netposa.npmobilesdk.utils.Util;
 
 /**
- * Created by Administrator on 2016/10/19.
+ * SimpleJavaJSWebChromeClient
  */
 
 public class SimpleJavaJSWebChromeClient extends WebChromeClient {

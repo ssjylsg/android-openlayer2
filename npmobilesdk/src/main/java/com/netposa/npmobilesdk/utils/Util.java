@@ -1,15 +1,12 @@
 package com.netposa.npmobilesdk.utils;
 
-import android.util.Log;
-
-import com.alibaba.fastjson.JSON;
 import com.netposa.npmobilesdk.Entity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * @brief 工具类
+ *  工具类
  */
 
 public class Util {

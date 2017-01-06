@@ -10,7 +10,7 @@ import com.netposa.npmobilesdk.map.NetPosaMap;
 
 
 /**
- * Created by Administrator on 2016/10/18.
+ *  NPWebViewClient
  */
 
 public class NPWebViewClient extends BridgeWebViewClient {

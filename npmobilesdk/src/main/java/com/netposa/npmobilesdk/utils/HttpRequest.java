@@ -9,7 +9,7 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 
 /**
- * Created by Administrator on 2016/11/21.
+ * HttpRequest
  */
 
 class HttpRequest {

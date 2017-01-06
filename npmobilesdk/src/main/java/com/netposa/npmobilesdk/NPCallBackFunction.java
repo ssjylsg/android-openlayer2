@@ -1,7 +1,7 @@
 package com.netposa.npmobilesdk;
 
 /**
- * Created by Administrator on 2016/10/21.
+ * 回调函数
  */
 
 public interface NPCallBackFunction<T> {

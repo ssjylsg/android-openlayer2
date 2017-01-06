@@ -1,7 +1,7 @@
 package com.netposa.npmobilesdk;
 
 /**
- * Created by Administrator on 2016/10/18.
+ * Size
  */
 
 public class Size {

@@ -3,7 +3,7 @@ package com.netposa.npmobilesdk.utils;
 import com.netposa.npmobilesdk.geometry.Point;
 
 /**
- * Created by Administrator on 2016/11/21.
+ * Feature
  */
 
 public class Feature {
