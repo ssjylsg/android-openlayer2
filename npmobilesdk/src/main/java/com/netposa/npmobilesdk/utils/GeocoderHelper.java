@@ -71,6 +71,10 @@ public class GeocoderHelper {
                 @Override
                 public void run() {
                     String result = HttpRequest.sendGet(url, parmeter);
+                    if(Util.isEmpty(result) && temp != null){
+                        temp.onCallBack(null);
+                        return;
+                    }
                     Feature feature = com.alibaba.fastjson.JSON.parseObject(result, Feature.class);
                     if (temp != null) {
                         feature.setPoint(address);
