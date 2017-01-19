@@ -18,7 +18,7 @@ public class GeocoderHelper {
     /**
      * 地址解析
      *
-     * @param netPosaUrl 如http://192.168.60.242:8080/netposa
+     * @param netPosaUrl       如http://192.168.60.242:8080/netposa
      * @param address
      * @param callBackFunction
      */
@@ -64,6 +64,9 @@ public class GeocoderHelper {
     public static void getLocation(String netPosaUrl, final Point address, NPCallBackFunction<Feature> callBackFunction) {
         final String url = netPosaUrl + "/query/poicoord";
         final String parmeter;
+        if (callBackFunction == null) {
+            return;
+        }
         final NPCallBackFunction<Feature> temp = callBackFunction;
         try {
             parmeter = "coord=" + URLEncoder.encode(address.getLon() + "," + address.getLat(), "UTF-8");
@@ -71,12 +74,14 @@ public class GeocoderHelper {
                 @Override
                 public void run() {
                     String result = HttpRequest.sendGet(url, parmeter);
-                    if(Util.isEmpty(result) && temp != null){
+                    if (Util.isEmpty(result)) {
                         temp.onCallBack(null);
                         return;
                     }
                     Feature feature = com.alibaba.fastjson.JSON.parseObject(result, Feature.class);
-                    if (temp != null) {
+                    if (feature == null) {
+                        temp.onCallBack(null);
+                    } else {
                         feature.setPoint(address);
                         temp.onCallBack(feature);
                     }
