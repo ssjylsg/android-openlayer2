@@ -1,7 +1,10 @@
 package com.netposa.npmobilesdk.map;
 
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
+import android.webkit.WebView;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.netposa.npmobilesdk.Entity;
@@ -56,11 +59,13 @@ public class NetPosaMap extends Entity {
         webSettings.setUseWideViewPort(true);
         webSettings.setLoadWithOverviewMode(true);
         webSettings.setJavaScriptEnabled(true);
-        webSettings.setGeolocationEnabled(true);
+        //webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        //webSettings.setGeolocationEnabled(true);
 
-        webSettings.setDatabaseEnabled(true);
-        webSettings.setDomStorageEnabled(true);
-        webSettings.setGeolocationEnabled(true);
+        // webSettings.setDatabaseEnabled(true);
+        // webSettings.setDomStorageEnabled(true);
+        // webSettings.setGeolocationEnabled(true);
+
         webView.requestFocus();
 
         webView.setDefaultHandler(new DefaultHandler());
@@ -116,15 +121,18 @@ public class NetPosaMap extends Entity {
 //            }
 //        });
 
-        webView.addJavascriptInterface(new JavaScriptObject (this),"ScaleLineHelper");
+        webView.addJavascriptInterface(new JavaScriptObject(this), "ScaleLineHelper");
     }
-    class  JavaScriptObject{
-        private  NetPosaMap map;
-        public JavaScriptObject(NetPosaMap map){
+
+    class JavaScriptObject {
+        private NetPosaMap map;
+
+        public JavaScriptObject(NetPosaMap map) {
             this.map = map;
         }
+
         @JavascriptInterface
-        public void ScaleLine(String data){
+        public void ScaleLine(String data) {
             com.alibaba.fastjson.JSONObject jsonObject = com.alibaba.fastjson.JSON.parseObject(data);
 
             Entity entity = Util.getEntity(jsonObject.getString("id"));
@@ -133,7 +141,10 @@ public class NetPosaMap extends Entity {
                         jsonObject.getString("width"), jsonObject.getString("content"));
             }
         }
-    };
+    }
+
+    ;
+
     public void CreateMap() {
         if (isMapavaild) {
             return;
@@ -359,9 +370,41 @@ public class NetPosaMap extends Entity {
 
     /**
      * 平移地图
+     *
      * @param point
      */
-    public void panTo(Point point){
-        this.ExecuteJs(this,"panTo",point);
+    public void panTo(Point point) {
+        this.ExecuteJs(this, "panTo", point);
+    }
+
+    /**
+     * 设置百度流量监控图层是否可见【暂时只针对百度图层】
+     *
+     * @param isVisable
+     */
+    public void setBaiduTrafficLayerVisable(boolean isVisable) {
+        this.ExecuteJs("setBaiduTrafficLayerVisable", isVisable);
+    }
+
+    /**
+     * 清除cache 缓存
+     *
+     * @param content
+     */
+    public static void clearCache(android.content.Context content, WebView view) {
+        try {
+            //清空所有Cookie
+            CookieSyncManager.createInstance(content);  //Create a singleton CookieSyncManager within a context
+            CookieManager cookieManager = CookieManager.getInstance(); // the singleton CookieManager instance
+            cookieManager.removeAllCookie();// Removes all cookies.
+            CookieSyncManager.getInstance().sync(); // forces sync manager to sync now
+
+            view.setWebChromeClient(null);
+            view.setWebViewClient(null);
+            view.getSettings().setJavaScriptEnabled(false);
+            view.clearCache(true);
+        } catch (Exception e) {
+
+        }
     }
 }
