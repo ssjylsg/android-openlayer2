@@ -1,5 +1,6 @@
 package com.netposa.npmobilesdk;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.netposa.npmobilesdk.event.EventArgs;
 import com.netposa.npmobilesdk.event.EventObject;
 import com.netposa.npmobilesdk.event.NPEventListener;
@@ -11,6 +12,7 @@ import java.util.Map;
  * 抽象实体类
  */
 public abstract class Entity {
+    @JSONField(serialize = false)
     protected Map<String, NPEventListener> events = new HashMap<>();
     private String id;
     private String className;

@@ -22,11 +22,13 @@ import com.netposa.npmobilesdk.jsbridge.DefaultHandler;
 import com.netposa.npmobilesdk.layer.Layer;
 import com.netposa.npmobilesdk.utils.Util;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 定义 NetPosaMap 地图对象的操作方法与接口
@@ -63,7 +65,7 @@ public class NetPosaMap extends Entity {
         //webSettings.setGeolocationEnabled(true);
 
         // webSettings.setDatabaseEnabled(true);
-        // webSettings.setDomStorageEnabled(true);
+        webSettings.setDomStorageEnabled(true);
         // webSettings.setGeolocationEnabled(true);
 
         webView.requestFocus();
@@ -85,7 +87,17 @@ public class NetPosaMap extends Entity {
             public void handler(String data, CallBackFunction function) {
                 EventCallBackArgs e = null;
                 try {
-                    e = com.alibaba.fastjson.JSON.parseObject(data, EventCallBackArgs.class);
+                    JSONObject temp = new JSONObject(data);
+                    JSONArray array = temp.getJSONArray("args");
+                    Object[] args = new Object[array.length()];
+                    for (int i = 0; i < array.length(); i++) {
+                        args[i] = array.get(i);
+                    }
+                    e = new EventCallBackArgs();
+                    e.setArgs(args);
+                    e.setEventType(temp.getString("eventType"));
+                    e.setId(temp.getString("id"));
+                    // e = com.alibaba.fastjson.JSON.parseObject(data, EventCallBackArgs.class);
                 } catch (Exception ex) {
 
                 }
@@ -364,8 +376,25 @@ public class NetPosaMap extends Entity {
         }, p0, p1);
     }
 
+    /**
+     * 新增事件
+     *
+     * @param type          事件类型
+     * @param eventListener
+     */
     public void addEventListener(String type, NPEventListener eventListener) {
+        this.ExecuteJs("register", type);
         this.events.put(type, eventListener);
+    }
+
+    /**
+     * 移除事件
+     *
+     * @param type
+     */
+    public void removeEventListener(String type) {
+        this.events.remove(type);
+        this.ExecuteJs("unregister",type);
     }
 
     /**
@@ -406,5 +435,22 @@ public class NetPosaMap extends Entity {
         } catch (Exception e) {
 
         }
+    }
+
+    /**
+     * 获取SDK 版本号
+     * @param version
+     */
+    public void getVersion(NPCallBackFunction<String> version) {
+        final NPCallBackFunction<String> temp = version;
+        this.ExecuteJs(this, "getVersion", new CallBackFunction() {
+            public void onCallBack(String data) {
+                if (!Util.isEmpty(data)) {
+                    if (temp != null) {
+                        temp.onCallBack(data);
+                    }
+                }
+            }
+        });
     }
 }

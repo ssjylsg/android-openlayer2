@@ -2,19 +2,21 @@ package com.example.administrator.myapplication;
 
 import android.app.AlertDialog;
 import android.content.res.Configuration;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
+
 
 import com.netposa.npmobilesdk.NPCallBackFunction;
 import com.netposa.npmobilesdk.common.Constants;
 import com.netposa.npmobilesdk.event.EventArgs;
 import com.netposa.npmobilesdk.event.EventObject;
 import com.netposa.npmobilesdk.event.NPEventListener;
+import com.netposa.npmobilesdk.geometry.Circle;
 import com.netposa.npmobilesdk.geometry.ClusterMarker;
 import com.netposa.npmobilesdk.geometry.Marker;
 import com.netposa.npmobilesdk.geometry.MarkerStyle;
@@ -30,7 +32,7 @@ import com.netposa.npmobilesdk.utils.Feature;
 import com.netposa.npmobilesdk.utils.GeocoderHelper;
 import com.netposa.npmobilesdk.utils.Image;
 import com.netposa.npmobilesdk.utils.Size;
-import com.netposa.npmobilesdk.utils.Util;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,10 +56,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         BridgeWebView webView = (BridgeWebView) findViewById(R.id.webView);
         // 初始化NetposaMap
 
-        map = new NetPosaMap(webView, "http://192.168.61.28:807/mobile/dist/mapConfig.json", "http://192.168.61.28:807/mobile/dist/index_c.html");
-        //"http://192.168.60.242:1080/mobile/dist/mapConfig.json", "http://192.168.60.242:1080/mobile/dist/index_c.html");
-        // / PropertyHelper.getValue("mapconfig").toString(), PropertyHelper.getValue("mapurl").toString());
-        LoadMap();
+
+
+        map = new NetPosaMap(webView, "mapConfig.json", "http://192.168.61.28:807/mobile/dist/index_c.html");
+        loadMap();
     }
 
     @Override
@@ -70,26 +72,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void LoadMap() {
+    private void loadMap() {
         // 创建一个自定义图层
         layer = new CustomerLayer("测试");
         // 将图层添加到地图
         map.addLayer(layer);
 
-        map.addEventListener(Constants.MAP_ScaleLine, new NPEventListener() {
+
+    }
+    private void mapAddClick(){
+        map.addEventListener(Constants.EVENT_TYPE_MAP_CLICK, new NPEventListener() {
             @Override
             public void processEvent(EventObject sender, EventArgs e) {
-                Object[] temp = (Object[]) e.getArgs();
-                String info = temp[0].toString() + " " + temp[1].toString();
-                Util.Info("MAP", info);
-                final String tempInfo = info;
-                handler.post(new Runnable() {
+                Object[] lonlat = (Object[])e.getArgs();
+                android.util.Log.i("map",e.toString());
+                double lon = Double.parseDouble(lonlat[0].toString());
+                double lat = Double.parseDouble(lonlat[1].toString());
+                Circle  circle = new Circle(new Point(lon,lat),1000,null);
+                layer.addOverlay(circle);
+                circle.getWKT(new com.netposa.npmobilesdk.event.NPCallBackFunction<String>() {
                     @Override
-                    public void run() {
-                        ((Button) (findViewById(R.id.add_btn))).setText(tempInfo);
+                    public void onCallBack(String data) {
+                        showMessage("提示",data);
+                        map.removeEventListener(Constants.EVENT_TYPE_MAP_CLICK);
                     }
                 });
-//                ((EditText)findViewById(R.id.editText)).setText(info);
             }
         });
     }
@@ -141,18 +148,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         ArrayList<ClusterMarker> markers = new ArrayList<>();
         Image image = new Image("img/marker.png", new Size(21, 25));
-        for (Integer i = 0; i < 30000; i++) {
+        for (Integer i = 0; i < 10; i++) {
             markers.add(new ClusterMarker(new Point(lon + Math.random() * Math.pow(-1, i) * 0.1,
                     lat + Math.random() * Math.pow(-1, i + 1) * 0.1), image));
-            if( i!=0 && i%5000 == 0) {
+           // if( i!=0 && i%5000 == 0) {
                 clusterLayer.addClusterMarkers(markers,false);
-                markers = new ArrayList<>();
-            }
-            if(i == 30000-1){
-                clusterLayer.addClusterMarkers(markers, true);
-            }
+             //   markers = new ArrayList<>();
+           // }
+          //  if(i == 30000-1){
+               // clusterLayer.addClusterMarkers(markers, true);
+          //  }
         }
-      //  clusterLayer.addClusterMarkers(markers,true);
+       clusterLayer.addClusterMarkers(markers,true);
 
 
 
@@ -192,9 +199,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.add_btn:
-                 addMarker();
+                 //addMarker();
                 // testMeasure();
                 //testGeocoderHelper();
+                mapAddClick();
+               // this.map.setBaiduTrafficLayerVisable(false);
                 break;
             case R.id.add_cluster_btn:
                 testAddClusterMarker();
@@ -214,14 +223,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         GeocoderHelper.getLocation("http://192.168.60.242:8080/netposa", new Point(119.95797015899728, 31.812219565250494), new NPCallBackFunction<Feature>() {
             @Override
             public void onCallBack(Feature data) {
-                ShowMessage("提示", data != null ? data.toString() : "请求为空");
+                showMessage("提示", data != null ? data.toString() : "请求为空");
             }
         });
 
         GeocoderHelper.getPoint("http://192.168.60.242:8080/netposa", "天宁商场店", new NPCallBackFunction<List<Point>>() {
             @Override
             public void onCallBack(List<Point> features) {
-                ShowMessage("提示", features.size() + "");
+                showMessage("提示", features.size() + "");
             }
         });
     }
@@ -229,9 +238,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void addMarker() {
         double lon = 116.3427702718185;
         double lat = 39.89369592052587;
-
+        this.map.setCenter(new Point(lon,lat));
         Point randomPoint = new Point(lon + Math.random() * Math.pow(-1, 3) * 0.1, lat + Math.random() * Math.pow(-1, 3) * 0.1);
-        Marker marker = new Marker(randomPoint, new MarkerStyle(
+        final Marker marker = new Marker(randomPoint, new MarkerStyle(
                 "img/marker.png", 21.0, 25.0
         ));
 
@@ -240,21 +249,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         marker.addEventListener(Constants.EVENT_TYPE_CLICK, new NPEventListener<Marker>() {
                     @Override
                     public void processEvent(EventObject<Marker> sender, EventArgs e) {
-                        final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                        builder.setTitle("单个点位点击事件").setMessage(sender.getSource().getPoint().toString()).show();
+                        //final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        //builder.setTitle("单个点位点击事件").setMessage(sender.getSource().getPoint().toString()).show();
+                        layer.removeOverlay(marker);
                     }
                 }
         );
-        map.getDistance(marker.getPoint(), new
-                Point(lon, lat), new NPCallBackFunction<Double>() {
-            @Override
-            public void onCallBack(Double data) {
-                ShowMessage("信息", data.toString());
-            }
-        });
+//        map.getDistance(marker.getPoint(), new
+//                Point(lon, lat), new NPCallBackFunction<Double>() {
+//            @Override
+//            public void onCallBack(Double data) {
+//                ShowMessage("信息", data.toString());
+//            }
+//        });
     }
 
-    private void ShowMessage(String title, String msg) {
+    private void showMessage(String title, String msg) {
         if (Looper.myLooper() == Looper.getMainLooper()) {
             final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             builder.setTitle(title).setMessage(msg).show();

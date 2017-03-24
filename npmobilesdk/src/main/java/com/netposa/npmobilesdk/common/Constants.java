@@ -6,6 +6,10 @@ package com.netposa.npmobilesdk.common;
 public class Constants {
 
     /**
+     * Map click 事件
+     */
+    public static final String EVENT_TYPE_MAP_CLICK = "touchend";
+    /**
      * CLICK 事件类型
      */
     public static final String EVENT_TYPE_CLICK = "click";

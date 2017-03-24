@@ -51,6 +51,8 @@ public abstract class Curve extends Entity {
         });
     }
 
+
+
     public void hide() {
         this.ExecuteJs("hide");
     }
