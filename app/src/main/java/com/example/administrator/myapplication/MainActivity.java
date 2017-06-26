@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
-        map = new NetPosaMap(webView, "mapConfig.json", "http://192.168.61.28:807/mobile/dist/index_c.html");
+        map = new NetPosaMap(webView, "mapConfig.json", "http://192.168.62.63:807/mobile/dist/index_c.html");
         loadMap();
     }
 
@@ -148,11 +148,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         ArrayList<ClusterMarker> markers = new ArrayList<>();
         Image image = new Image("img/marker.png", new Size(21, 25));
-        for (Integer i = 0; i < 10; i++) {
+        for (Integer i = 0; i < 1000; i++) {
             markers.add(new ClusterMarker(new Point(lon + Math.random() * Math.pow(-1, i) * 0.1,
                     lat + Math.random() * Math.pow(-1, i + 1) * 0.1), image));
            // if( i!=0 && i%5000 == 0) {
-                clusterLayer.addClusterMarkers(markers,false);
+               // clusterLayer.addClusterMarkers(markers,false);
              //   markers = new ArrayList<>();
            // }
           //  if(i == 30000-1){

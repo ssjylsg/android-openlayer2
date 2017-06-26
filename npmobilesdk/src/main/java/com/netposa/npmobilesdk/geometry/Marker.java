@@ -1,9 +1,8 @@
 package com.netposa.npmobilesdk.geometry;
 
 /**
- * Created by Administrator on 2016/10/19.
+ *  图片覆盖物
  */
-
 public class Marker extends Curve {
     private Point point;
     private MarkerStyle options;

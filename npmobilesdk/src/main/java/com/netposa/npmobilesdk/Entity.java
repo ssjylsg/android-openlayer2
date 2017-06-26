@@ -21,7 +21,6 @@ public abstract class Entity {
         this.id = Util.generateId();
         Util.AddEntity(this);
     }
-
     /**
      *
      * @return className
@@ -38,10 +37,18 @@ public abstract class Entity {
         this.className = className;
     }
 
+    /**
+     * 设置ID
+     * @return
+     */
     public String getId() {
         return this.id;
     }
 
+    /**
+     * 获取ID
+     * @param id
+     */
     protected void setId(String id) {
         this.id = id;
     }
