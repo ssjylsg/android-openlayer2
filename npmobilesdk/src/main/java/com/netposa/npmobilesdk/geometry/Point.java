@@ -6,16 +6,26 @@ import com.netposa.npmobilesdk.Entity;
  * 点位
  */
 
-public class Point extends Entity {
+public class Point  { //extends Entity
 
     private double lon = 0.0;
     private double lat = 0.0;
 
     public Point() {
-        this.setClassName("P");
-        this.setId("");
+//        this.setClassName("P");
+//        this.setId("");
     }
-
+    public String getClassName() {
+        return "P";
+    }
+    /**
+     * 重写toString，实现对象转为JSON
+     * @return Json字符串
+     */
+    @Override
+    public String toString() {
+        return com.alibaba.fastjson.JSON.toJSONString(this);
+    }
     /**
      * 84坐标系Point
      * @param lon 横坐标

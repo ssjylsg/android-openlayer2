@@ -5,6 +5,7 @@ import com.netposa.npmobilesdk.event.EventArgs;
 import com.netposa.npmobilesdk.event.EventObject;
 import com.netposa.npmobilesdk.event.NPEventListener;
 import com.netposa.npmobilesdk.geometry.ClusterMarker;
+import com.netposa.npmobilesdk.geometry.ClusterMarkerList;
 import com.netposa.npmobilesdk.utils.Util;
 
 import java.util.ArrayList;
@@ -62,6 +63,15 @@ public class ClusterLayer extends Layer {
         this.ExecuteJs("addOverlays", list, true);
     }
 
+    /**
+     * 批量数据加载 建议20000 数据提交一次
+     * @param markers
+     * @param isComplete 是否加载完成
+     */
+    public void addOverlayList(ClusterMarkerList markers,boolean isComplete) {
+        String msg = "javascript:WebViewJavascriptBridge._handleMessageFromNative('{\"handlerName\":\"NPMobileHelper.callMethod\"}'," + this.toString() + ",'addOverlayList'," + markers.toString() + "," + (isComplete ? "true" : "false") + ")";
+        this.map.loadUrl(msg);
+    }
     @Override
     public void processEvent(String event, Object... args) {
         ClusterMarker marker = (ClusterMarker) Util.getEntity(args[0].toString());

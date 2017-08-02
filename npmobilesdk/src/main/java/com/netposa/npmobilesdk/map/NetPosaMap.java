@@ -177,8 +177,11 @@ public class NetPosaMap extends Entity {
         }
     }
 
-    private void loadUrl(String url) {
+    public void loadUrl(String url) {
         this.webView.loadUrl(url);
+        if (webView.debug) {
+            android.util.Log.i("MSG", url);
+        }
     }
 
     private Object ExecuteJs(String method, Object... args) {
@@ -214,6 +217,7 @@ public class NetPosaMap extends Entity {
         });
         return outMsg;
     }
+
 
     public <T extends Entity> Object ExecuteJs(T obj, String method, CallBackFunction callBack, Object... args) {
         String msg = this.getJavascript(obj, method, args);

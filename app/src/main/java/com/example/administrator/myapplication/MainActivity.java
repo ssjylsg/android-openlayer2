@@ -18,6 +18,7 @@ import com.netposa.npmobilesdk.event.EventObject;
 import com.netposa.npmobilesdk.event.NPEventListener;
 import com.netposa.npmobilesdk.geometry.Circle;
 import com.netposa.npmobilesdk.geometry.ClusterMarker;
+import com.netposa.npmobilesdk.geometry.ClusterMarkerList;
 import com.netposa.npmobilesdk.geometry.Marker;
 import com.netposa.npmobilesdk.geometry.MarkerStyle;
 import com.netposa.npmobilesdk.geometry.Point;
@@ -56,10 +57,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         BridgeWebView webView = (BridgeWebView) findViewById(R.id.webView);
         // 初始化NetposaMap
 
-
+       // webView.debug = true;
 
         map = new NetPosaMap(webView, "mapConfig.json", "http://192.168.62.63:807/mobile/dist/index_c.html");
         loadMap();
+
+        ((Button)findViewById(R.id.data_btn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clusterData();
+            }
+        });
     }
 
     @Override
@@ -130,36 +138,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void testAddClusterMarker() {
-        double lon = 116.3427702718185;
-        double lat = 39.89369592052587;
-
-        ClusterLayerOptions options = new ClusterLayerOptions();
-        options.setFontColor("#000000");
-        options.setFontSize("23px");
-        options.setClusterImage(new Image("img/Flag.png", new Size(32, 32)));
-        List<ClusterStatisticInfo> statisticInfos = new ArrayList<>();
-        statisticInfos.add(new ClusterStatisticInfo(lon, lat, "50"));
-//        options.setStatistics(statisticInfos);
-        options.setMinZoom(6);
-        // options.setSingleImage(new Image("img/marker.png", new Size(21, 25)));
-        ClusterLayer clusterLayer = new ClusterLayer("聚合图层测试", options);
-        this.map.addLayer(clusterLayer);
-
-
-        ArrayList<ClusterMarker> markers = new ArrayList<>();
-        Image image = new Image("img/marker.png", new Size(21, 25));
-        for (Integer i = 0; i < 1000; i++) {
-            markers.add(new ClusterMarker(new Point(lon + Math.random() * Math.pow(-1, i) * 0.1,
-                    lat + Math.random() * Math.pow(-1, i + 1) * 0.1), image));
-           // if( i!=0 && i%5000 == 0) {
-               // clusterLayer.addClusterMarkers(markers,false);
-             //   markers = new ArrayList<>();
-           // }
-          //  if(i == 30000-1){
-               // clusterLayer.addClusterMarkers(markers, true);
-          //  }
-        }
-       clusterLayer.addClusterMarkers(markers,true);
 
 
 
@@ -199,18 +177,62 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.add_btn:
-                 //addMarker();
+                // addMarker();
                 // testMeasure();
                 //testGeocoderHelper();
-                mapAddClick();
+               mapAddClick();
                // this.map.setBaiduTrafficLayerVisable(false);
                 break;
             case R.id.add_cluster_btn:
-                testAddClusterMarker();
+                long start = new java.util.Date().getTime();
+                clusterLayer.addOverlayList(list,false);
+                clusterLayer.addOverlayList(list1,true);
+                this.showMessage("提示","耗时:"+(new java.util.Date().getTime() - start));
+                break;
+            case R.id.data_btn:
+                clusterData();
                 break;
         }
     }
+    ClusterLayer clusterLayer;
+    ClusterMarkerList list;
+    ClusterMarkerList list1;
+    private  void clusterData(){
+        double lon = 116.3427702718185;
+        double lat = 39.89369592052587;
 
+        map.setCenter(new Point(lon,lat));
+        ClusterLayerOptions options = new ClusterLayerOptions();
+        options.setFontColor("#000000");
+        options.setFontSize("23px");
+        options.setClusterImage(new Image("img/Flag.png", new Size(32, 32)));
+        List<ClusterStatisticInfo> statisticInfos = new ArrayList<>();
+        statisticInfos.add(new ClusterStatisticInfo(lon, lat, "50"));
+
+        options.setMinZoom(6);
+
+        clusterLayer = new ClusterLayer("聚合图层测试", options);
+        this.map.addLayer(clusterLayer);
+
+        testAddClusterMarker();
+
+        Image image = new Image("img/marker.png", new Size(21, 25));
+
+
+        list  = new ClusterMarkerList(image);
+        for (int i =0;i<20000;i++){
+            list.addMarker(new Point(lon + Math.random() * Math.pow(-1, i) * 0.1,
+                    lat + Math.random() * Math.pow(-1, i + 1) * 0.1),null,clusterLayer);
+        }
+
+
+        list1 = new ClusterMarkerList(image);
+        for (int i =0;i<20000;i++){
+            list1.addMarker(new Point(lon + Math.random() * Math.pow(-1, i) * 0.1,
+                    lat + Math.random() * Math.pow(-1, i + 1) * 0.1),null,clusterLayer);
+        }
+        showMessage("提示","数据整理完成");
+    }
 
     private void testMeasure() {
         Measure measure = new Measure(this.map);

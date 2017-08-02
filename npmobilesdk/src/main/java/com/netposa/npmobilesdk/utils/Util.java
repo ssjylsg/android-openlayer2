@@ -23,14 +23,15 @@ public class Util {
     public static void removeEntity(Entity entity) {
         _entities.remove(entity.getId());
     }
-
+    private static int sn = 1;
     /**
      * 产生GUID
      *
      * @return {String}
      */
-    public static String generateId() {
-        return java.util.UUID.randomUUID().toString();
+    public synchronized  static String generateId() {
+        return (++sn) + "";
+        //return java.util.UUID.randomUUID().toString();
     }
 
     /**

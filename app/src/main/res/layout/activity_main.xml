@@ -18,6 +18,12 @@
             android:text="添加单个点位"
             android:layout_height="match_parent" />
         <Button
+            android:id="@+id/data_btn"
+            android:layout_width="0.0dp"
+            android:layout_weight="1"
+            android:text="数据准备"
+            android:layout_height="match_parent" />
+        <Button
             android:id="@+id/add_cluster_btn"
             android:layout_width="0.0dp"
             android:layout_weight="1"

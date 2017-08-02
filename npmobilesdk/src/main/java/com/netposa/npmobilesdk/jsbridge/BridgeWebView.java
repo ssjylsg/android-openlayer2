@@ -7,20 +7,13 @@ import android.os.Looper;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.webkit.WebView;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.netposa.npmobilesdk.utils.Util;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * BridgeWebView
@@ -123,51 +116,22 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge {
             dispatchMessage(m);
         }
     }
-
-    void dispatchMessage(Message m) {
+    public boolean debug = false;
+     void dispatchMessage(Message m) {
         String messageJson = m.toJson();
         String javascriptCommand = String.format("javascript:WebViewJavascriptBridge._handleMessageFromNative('%s',", messageJson) + m.getData() + ");";
-        android.util.Log.i("MSG", javascriptCommand);
+
+
         if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
-
-           // String msg = compressForGzip(javascriptCommand);
-            this.loadUrl(javascriptCommand);
-           // android.util.Log.i("MSG", msg);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                this.evaluateJavascript(javascriptCommand, null);
+            } else {
+                this.loadUrl(javascriptCommand);
+            }
+            if (debug) {
+                Log.i("MSG", javascriptCommand);
+            }
         }
-    }
-
-//    void test() {
-//        JSONArray array = new JSONArray();
-//        for (int i = 0; i < 5; i++) {
-//            JSONObject jsonObject = new JSONObject();
-//            jsonObject.put("foo", "bar");
-//            jsonObject.put("baz", "ABC");
-//            array.add(jsonObject);
-//        }
-//        String msg = com.alibaba.fastjson.JSON.toJSONString(array);
-//        android.util.Log.i("DEUG", msg);
-//        msg = compressForGzip(msg);
-//        android.util.Log.i("DEUG", msg);
-//    }
-    String compressForGzip(String unGzipStr) {
-        if (TextUtils.isEmpty(unGzipStr)) {
-            return null;
-        }
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            GZIPOutputStream gzip = new GZIPOutputStream(baos);
-            gzip.write(unGzipStr.getBytes());
-            gzip.close();
-            byte[] encode = baos.toByteArray();
-            baos.flush();
-            baos.close();
-            return android.util.Base64.encodeToString(encode, 0);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     void flushMessageQueue() {
