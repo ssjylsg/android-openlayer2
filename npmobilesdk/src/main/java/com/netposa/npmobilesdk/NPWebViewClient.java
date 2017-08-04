@@ -1,8 +1,10 @@
 package com.netposa.npmobilesdk;
 
-import android.webkit.WebResourceError;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebView;
+//import android.webkit.WebResourceError;
+//import android.webkit.WebResourceRequest;
+//import android.webkit.WebView;
+
+import com.tencent.smtt.sdk.WebView;
 
 import com.netposa.npmobilesdk.jsbridge.BridgeWebView;
 import com.netposa.npmobilesdk.jsbridge.BridgeWebViewClient;
@@ -28,10 +30,10 @@ public class NPWebViewClient extends BridgeWebViewClient {
         super.onPageFinished(view, url);
     }
 
-    @Override
-    public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-        android.util.Log.e("NPWebViewClient", error.toString());
-    }
+//    @Override
+//    public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+//        android.util.Log.e("NPWebViewClient", error.toString());
+//    }
 
 
 

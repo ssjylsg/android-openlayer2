@@ -24,7 +24,7 @@ public class ClusterMarkerList {
      * @param image 如果为null，才采用默认的image
      * @param layer 所在图层，不能为空
      */
-    public void addMarker(Point point, Image image, ClusterLayer layer) throws NullPointerException {
+    public ClusterMarker addMarker(Point point, Image image, ClusterLayer layer) throws NullPointerException {
         if(point == null){
             throw new NullPointerException("Point 位置点不能为空");
         }
@@ -41,6 +41,7 @@ public class ClusterMarkerList {
             jsonObject.put("image", image);
         }
         markers.add(jsonObject);
+        return marker;
     }
 
     public Image getDefaultUrl() {

@@ -16,11 +16,16 @@ import com.netposa.npmobilesdk.geometry.Point;
 import com.netposa.npmobilesdk.jsbridge.BridgeWebView;
 import com.netposa.npmobilesdk.jsbridge.BridgeWebViewClient;
 import com.netposa.npmobilesdk.jsbridge.DefaultHandler;
+import com.netposa.npmobilesdk.layer.ClusterLayer;
+import com.netposa.npmobilesdk.layer.ClusterLayerOptions;
+import com.netposa.npmobilesdk.layer.ClusterStatisticInfo;
+import com.netposa.npmobilesdk.map.NetPosaMap;
 import com.netposa.npmobilesdk.utils.Image;
 import com.netposa.npmobilesdk.utils.Size;
 
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -34,18 +39,7 @@ public class TestWindow extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-//        QbSdk.PreInitCallback cb = new QbSdk.PreInitCallback() {
-//            @Override
-//            public void onViewInitFinished(boolean arg0) {
-//
-//                Log.d("app", " onViewInitFinished is " + arg0);
-//            }
-//            @Override
-//            public void onCoreInitFinished() {
-//
-//            }
-//        };
-//        QbSdk.initX5Environment(getApplicationContext(), cb);
+        NetPosaMap.initX5Environment(this);
 
         setContentView(R.layout.testwindow);
         //final WebView webView = (WebView) findViewById(R.id.webView);
@@ -56,15 +50,28 @@ public class TestWindow extends Activity {
 
 
         webView.setWebViewClient(new BridgeWebViewClient(webView));
+        ClusterLayerOptions options = new ClusterLayerOptions();
+        options.setFontColor("#000000");
+        options.setFontSize("23px");
+        options.setMinZoom(6);
+        final ClusterLayer clusterLayer = new ClusterLayer("聚合图层测试", options);
 
         ((Button)findViewById(R.id.test)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<ClusterMarker> markers = new ArrayList<>();
-                Image image = new Image("img/marker.png", new Size(21, 25));
-                double lon = 108.23;
-                double lat = 23.65;
-                long start =  new java.util.Date().getTime();
+                webView.loadUrl("javascript:testCluster()");
+            }
+        });
+
+        webView.loadUrl("http://192.168.62.63:807/mobile/dist/index.html");
+    }
+
+    private  void Test(BridgeWebView webView,ClusterLayer clusterLayer){
+        ArrayList<ClusterMarker> markers = new ArrayList<>();
+        Image image = new Image("img/marker.png", new Size(21, 25));
+        double lon = 108.23;
+        double lat = 23.65;
+        long start =  new java.util.Date().getTime();
 //               for (int j = 0 ;j<2;j++) {
 ////                   if(j > 4) {
 ////                       try {
@@ -87,18 +94,18 @@ public class TestWindow extends Activity {
 //               }
 //                webView.loadUrl("javascript:calc("+start+")");
 
-                ClusterMarkerList list = new ClusterMarkerList(image);
-                for (int i =0;i<3;i++){
-                    list.addMarker(new Point(lon + Math.random() * Math.pow(-1, i) * 0.1,
-                               lat + Math.random() * Math.pow(-1, i + 1) * 0.1),null,null);
-                }
-                start =  new java.util.Date().getTime();
-                android.util.Log.i("序列化之前", new java.util.Date().getTime() + "");
-                String msg = list.toString();
-                android.util.Log.i("序列化之后", new java.util.Date().getTime() + "");
-                webView.callHandler("testMethod",msg,null);
-                webView.loadUrl("javascript:calc("+start+")");
-                android.util.Log.i("MSG",msg);
+        ClusterMarkerList list = new ClusterMarkerList(image);
+        for (int i =0;i<30000;i++){
+            list.addMarker(new Point(lon + Math.random() * Math.pow(-1, i) * 0.1,
+                    lat + Math.random() * Math.pow(-1, i + 1) * 0.1),null,clusterLayer);
+        }
+        start =  new java.util.Date().getTime();
+        android.util.Log.i("序列化之前", new java.util.Date().getTime() + "");
+        String msg = list.toString();
+        android.util.Log.i("序列化之后", new java.util.Date().getTime() + "");
+        webView.callHandler("testMethod",msg,null);
+        webView.loadUrl("javascript:calc("+start+")");
+        android.util.Log.i("MSG",msg);
 //                list = new ClusterMarkerList(image);
 //                for (int i =0;i<10000;i++){
 //                    list.addMarker(new Point(lon + Math.random() * Math.pow(-1, i) * 0.1,
@@ -110,9 +117,5 @@ public class TestWindow extends Activity {
 //                android.util.Log.i("序列化之后", new java.util.Date().getTime() + "");
 //                webView.callHandler("testMethod",msg,null);
 //                webView.loadUrl("javascript:calc("+start+")");
-            }
-        });
-
-   webView.loadUrl("http://192.168.62.63:807/mobile/dist/test.html");
     }
 }

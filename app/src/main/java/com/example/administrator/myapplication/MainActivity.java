@@ -2,7 +2,6 @@ package com.example.administrator.myapplication;
 
 import android.app.AlertDialog;
 import android.content.res.Configuration;
-
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -10,7 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
-
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.netposa.npmobilesdk.NPCallBackFunction;
 import com.netposa.npmobilesdk.common.Constants;
 import com.netposa.npmobilesdk.event.EventArgs;
@@ -19,6 +19,7 @@ import com.netposa.npmobilesdk.event.NPEventListener;
 import com.netposa.npmobilesdk.geometry.Circle;
 import com.netposa.npmobilesdk.geometry.ClusterMarker;
 import com.netposa.npmobilesdk.geometry.ClusterMarkerList;
+import com.netposa.npmobilesdk.geometry.ClusterParmeters;
 import com.netposa.npmobilesdk.geometry.Marker;
 import com.netposa.npmobilesdk.geometry.MarkerStyle;
 import com.netposa.npmobilesdk.geometry.Point;
@@ -34,7 +35,11 @@ import com.netposa.npmobilesdk.utils.GeocoderHelper;
 import com.netposa.npmobilesdk.utils.Image;
 import com.netposa.npmobilesdk.utils.Size;
 
-
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,10 +49,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private NetPosaMap map;
     private Button addBtn, add_cluster_btn;
     private CustomerLayer layer;
-
+    private String clusterApiUrl = "data.json?v=12";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        NetPosaMap.initX5Environment(this.getApplicationContext());
+
         setContentView(R.layout.activity_main);
 
         addBtn = (Button) findViewById(R.id.add_btn);
@@ -57,15 +64,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         BridgeWebView webView = (BridgeWebView) findViewById(R.id.webView);
         // 初始化NetposaMap
 
-       // webView.debug = true;
+        webView.debug = true;
 
-        map = new NetPosaMap(webView, "mapConfig.json", "http://192.168.62.63:807/mobile/dist/index_c.html");
+        map = new NetPosaMap(webView, "mapConfig.json", "http://192.168.62.63:807/mobile/dist/index_c.html", clusterApiUrl);
+
         loadMap();
 
-        ((Button)findViewById(R.id.data_btn)).setOnClickListener(new View.OnClickListener() {
+        ((Button) findViewById(R.id.data_btn)).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                clusterData();
+            public void onClick(View v) {clusterData();
             }
         });
     }
@@ -139,31 +146,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void testAddClusterMarker() {
 
-
-
         clusterLayer.addEventListener(Constants.EVENT_TYPE_CLICK, new NPEventListener<ClusterMarker>() {
             @Override
             public void processEvent(EventObject<ClusterMarker> sender, EventArgs e) {
-
-//                final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-//                builder.setTitle("聚合事件").setMessage(sender.getSource().getPoint().toString()).show();
-//
-//                // 获取当前缩放等级
-//                map.getZoom(new NPCallBackFunction<Integer>() {
-//                    @Override
-//                    public void onCallBack(Integer data) {
-//                        Util.Info("getZoom", "ok");
-//                    }
-//                });
-//                // 获取当前中心点
-//                map.getCenter(new NPCallBackFunction<Point>() {
-//                    @Override
-//                    public void onCallBack(Point data) {
-//
-//                    }
-//                });
-//                map.setCenter(sender.getSource().getPoint());
                 sender.getSource().changeStyle(new MarkerStyle("img/Flag.png", 21.0, 25.0));
+            }
+        });
+
+        clusterLayer.addEventListener(Constants.EVENT_TYPE_ERROR, new NPEventListener<ClusterLayer>() {
+            @Override
+            public void processEvent(EventObject<ClusterLayer> sender, EventArgs e) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("提示").setMessage("加载失败").show();
+            }
+        });
+
+        clusterLayer.addEventListener(Constants.EVENT_TYPE_SUCCESS, new NPEventListener<ClusterLayer>() {
+            @Override
+            public void processEvent(EventObject<ClusterLayer> sender, EventArgs e) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("提示").setMessage("加载成功").show();
             }
         });
     }
@@ -180,14 +182,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // addMarker();
                 // testMeasure();
                 //testGeocoderHelper();
-               mapAddClick();
-               // this.map.setBaiduTrafficLayerVisable(false);
+                mapAddClick();
+                // this.map.setBaiduTrafficLayerVisable(false);
                 break;
             case R.id.add_cluster_btn:
                 long start = new java.util.Date().getTime();
-                clusterLayer.addOverlayList(list,false);
-                clusterLayer.addOverlayList(list1,true);
-                this.showMessage("提示","耗时:"+(new java.util.Date().getTime() - start));
+
+//                clusterLayer.addOverlayList(list,false);
+//                clusterLayer.addOverlayList(list1,true);
+
+                clusterLayer.addOverlaysForMobile(new ClusterParmeters(clusterApiUrl,new Image("img/marker.png", new Size(21, 25))));
+
+                //this.showMessage("提示","耗时:"+(new java.util.Date().getTime() - start));
                 break;
             case R.id.data_btn:
                 clusterData();
@@ -197,11 +203,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ClusterLayer clusterLayer;
     ClusterMarkerList list;
     ClusterMarkerList list1;
-    private  void clusterData(){
+    private  void clusterData() {
         double lon = 116.3427702718185;
         double lat = 39.89369592052587;
 
-        map.setCenter(new Point(lon,lat));
+        // map.setCenter(new Point(lon,lat));
         ClusterLayerOptions options = new ClusterLayerOptions();
         options.setFontColor("#000000");
         options.setFontSize("23px");
@@ -216,22 +222,60 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         testAddClusterMarker();
 
-        Image image = new Image("img/marker.png", new Size(21, 25));
+//        Image image = new Image("img/marker.png", new Size(21, 25));
+//
+//
+//        list  = new ClusterMarkerList(image);
+//        for (int i =0;i<20000;i++){
+//            list.addMarker(new Point(lon + Math.random() * Math.pow(-1, i) * 0.1,
+//                    lat + Math.random() * Math.pow(-1, i + 1) * 0.1),null,clusterLayer);
+//        }
+//
+//
+//        list1 = new ClusterMarkerList(image);
+//        for (int i =0;i<20000;i++){
+//            list1.addMarker(new Point(lon + Math.random() * Math.pow(-1, i) * 0.1,
+//                    lat + Math.random() * Math.pow(-1, i + 1) * 0.1),null,clusterLayer);
+//        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String url = java.net.URLEncoder.encode("http://192.168.60.37:82/pmvp/api/getchannelofdir?userid=3&id=Gps","UTF-8");
+                    android.util.Log.i("",url);
+                    HttpURLConnection connection = ((HttpURLConnection) new URL("http://192.168.62.63:807/mobile/dist/data.json").openConnection());
+                    connection.setRequestProperty("Charset", "UTF-8");
+                    connection.connect();
+                    InputStream is = connection.getInputStream();
+                    byte[] buffer = new byte[1024];
+                    int length = 0;
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    while (length != -1) {
+                        try {
+                            length = is.read(buffer);
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                        if (length != -1) {
+                            out.write(buffer, 0, length);
+                        }
+                    }
+                    JSONObject o = (JSONObject) com.alibaba.fastjson.JSONObject.parse(new String(out.toByteArray(), "utf-8"));
+                    JSONArray channel = (JSONArray)((JSONObject)o.get("data")).get("channel");
+                    for (int i =0;i<channel.size();i++){
+                        JSONObject m = (JSONObject)channel.get(i);
+                        new ClusterMarker(m.getString("id"),new Point(m.getBigDecimal("longitude").doubleValue(),m.getBigDecimal("latitude").doubleValue()),null)
+                                .setLayer(clusterLayer);
+                    }
+                    android.util.Log.i("",channel.toString());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
 
-
-        list  = new ClusterMarkerList(image);
-        for (int i =0;i<20000;i++){
-            list.addMarker(new Point(lon + Math.random() * Math.pow(-1, i) * 0.1,
-                    lat + Math.random() * Math.pow(-1, i + 1) * 0.1),null,clusterLayer);
-        }
-
-
-        list1 = new ClusterMarkerList(image);
-        for (int i =0;i<20000;i++){
-            list1.addMarker(new Point(lon + Math.random() * Math.pow(-1, i) * 0.1,
-                    lat + Math.random() * Math.pow(-1, i + 1) * 0.1),null,clusterLayer);
-        }
-        showMessage("提示","数据整理完成");
+        }).start();
+        showMessage("提示", "数据整理完成");
     }
 
     private void testMeasure() {
@@ -299,6 +343,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             });
         }
-
     }
 }
+
+   

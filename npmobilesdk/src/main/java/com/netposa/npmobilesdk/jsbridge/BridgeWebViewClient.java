@@ -1,9 +1,11 @@
 package com.netposa.npmobilesdk.jsbridge;
 
 import android.graphics.Bitmap;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
+//import android.webkit.WebView;
+//import android.webkit.WebViewClient;
 
+import com.tencent.smtt.sdk.WebViewClient;
+import com.tencent.smtt.sdk.WebView;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 

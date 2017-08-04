@@ -21,6 +21,12 @@ public abstract class Entity {
         this.id = Util.generateId();
         Util.AddEntity(this);
     }
+
+    protected Entity(String id) {
+        this.id = id;
+        Util.AddEntity(this);
+    }
+
     /**
      *
      * @return className

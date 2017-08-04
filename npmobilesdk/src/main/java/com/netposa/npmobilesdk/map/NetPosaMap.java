@@ -1,10 +1,16 @@
 package com.netposa.npmobilesdk.map;
 
-import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
+
+
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.PixelFormat;
 import android.webkit.JavascriptInterface;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
+import com.tencent.smtt.sdk.CookieManager;
+import com.tencent.smtt.sdk.CookieSyncManager;
+import com.tencent.smtt.sdk.QbSdk;
+import com.tencent.smtt.sdk.WebView;
+import com.tencent.smtt.sdk.WebSettings;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.netposa.npmobilesdk.Entity;
@@ -26,9 +32,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
 
 /**
  * 定义 NetPosaMap 地图对象的操作方法与接口
@@ -45,13 +52,34 @@ public class NetPosaMap extends Entity {
     private String outMsg;
 
     /**
+     * 基于X5
+     * @param context
+     */
+    public static void initX5Environment(Context context) {
+        // 防止闪烁
+        //activity.getWindow().setFormat(PixelFormat.TRANSLUCENT);
+        QbSdk.PreInitCallback cb = new QbSdk.PreInitCallback() {
+            @Override
+            public void onViewInitFinished(boolean arg0) {
+
+            }
+
+            @Override
+            public void onCoreInitFinished() {
+
+            }
+        };
+        QbSdk.initX5Environment(context, cb);
+    }
+    /**
      * NetPosaMap 构造函数
      *
      * @param webView   webView
      * @param mapConfig 地图配置地址
      * @param mapUrl    地图地址
+     * @param clusterUrl  请求聚合数据地址
      */
-    public NetPosaMap(BridgeWebView webView, String mapConfig, String mapUrl) {
+    public NetPosaMap(BridgeWebView webView, String mapConfig, String mapUrl,String clusterUrl) {
         this.setClassName("NPMobile.Map");
         this.mapConfig = mapConfig;
 
@@ -76,7 +104,16 @@ public class NetPosaMap extends Entity {
 
         this.webView = webView;
 
-        this.loadUrl(mapUrl);
+        if (clusterUrl == null || clusterUrl.length() == 0) {
+            this.loadUrl(mapUrl);
+        } else {
+            try {
+                this.loadUrl(mapUrl + "?q=" + java.net.URLEncoder.encode(clusterUrl,"UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                this.loadUrl(mapUrl);
+            }
+        }
+
         manager = new EventManager();
 
         /**
@@ -97,7 +134,6 @@ public class NetPosaMap extends Entity {
                     e.setArgs(args);
                     e.setEventType(temp.getString("eventType"));
                     e.setId(temp.getString("id"));
-                    // e = com.alibaba.fastjson.JSON.parseObject(data, EventCallBackArgs.class);
                 } catch (Exception ex) {
 
                 }
@@ -111,28 +147,6 @@ public class NetPosaMap extends Entity {
                 }
             }
         });
-
-
-//        webView.registerHandler("NPMobileHelper.ScaleLine", new BridgeHandler() {
-//            @Override
-//            public void handler(String data, CallBackFunction function) {
-//                com.alibaba.fastjson.JSONObject jsonObject = com.alibaba.fastjson.JSON.parseObject(data);
-//
-//                Entity entity = Util.getEntity(jsonObject.getString("id"));
-//                if (entity != null) {
-//                    entity.processEvent(jsonObject.getString("eventType"),
-//                            jsonObject.getString("width"), jsonObject.getString("content"));
-//                }
-//
-//                //this.processEvent("ScaleLine",data );
-//
-////                NPEventListener e = this.events.get(event);
-////                if(e != null){
-////                    e.processEvent(new EventObject(this), new EventArgs(args));
-////                }
-//            }
-//        });
-
         webView.addJavascriptInterface(new JavaScriptObject(this), "ScaleLineHelper");
     }
 
@@ -155,7 +169,7 @@ public class NetPosaMap extends Entity {
         }
     }
 
-    ;
+
 
     public void CreateMap() {
         if (isMapavaild) {
@@ -456,5 +470,8 @@ public class NetPosaMap extends Entity {
                 }
             }
         });
+    }
+    public void initCluster(String url){
+        this.loadUrl("javascript:initCluster('"+url+"')");
     }
 }
