@@ -24,22 +24,27 @@ public class GeocoderHelper {
      */
     public static void getPoint(String netPosaUrl, String address, NPCallBackFunction<List<Point>> callBackFunction) {
         final String url = netPosaUrl + "/query/poiname";
-        final String parmeter;
-        final NPCallBackFunction<List<Point>> temp = callBackFunction;
-        HttpRequest.sendGet(netPosaUrl + "/query/poiname", "keyWord=" + address);
 
+        final NPCallBackFunction<List<Point>> temp = callBackFunction;
         try {
-            parmeter = "keyWord=" + URLEncoder.encode(address, "UTF-8");
+            final String  parmeter = "keyWord=" + URLEncoder.encode(address, "UTF-8");
             Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
                     String result = HttpRequest.sendGet(url, parmeter);
                     List<Point> features = new ArrayList<>();
+                    if (Util.isEmpty(result) && temp != null) {
+                        temp.onCallBack(features);
+                        return;
+                    }
                     JSONObject jsonObject = com.alibaba.fastjson.JSON.parseObject(result);
                     JSONArray jsonArray = jsonObject.getJSONArray("features");
                     int count = jsonArray.size();
+                    JSONObject  geometry = null;
+                    JSONArray coordinates = null;
                     for (int i = 0; i < count; i++) {
-                        JSONArray coordinates = jsonArray.getJSONObject(i).getJSONObject("geometry").getJSONArray("coordinates");
+                        geometry = com.alibaba.fastjson.JSON.parseObject(jsonArray.getJSONObject(i).getString("geometry"));
+                        coordinates =  geometry.getJSONArray("coordinates");
                         features.add(new Point(coordinates.getDouble(0), coordinates.getDouble(1)));
                     }
                     if (temp != null) {

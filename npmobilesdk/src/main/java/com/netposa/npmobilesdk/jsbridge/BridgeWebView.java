@@ -8,7 +8,9 @@ import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
-import com.tencent.smtt.sdk.WebView;
+import android.view.MotionEvent;
+import android.webkit.WebView;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -225,4 +227,14 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge {
     public void callHandler(String handlerName, String data, CallBackFunction callBack) {
         doSend(handlerName, data, callBack);
     }
+
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//        if (event.getAction() == MotionEvent.ACTION_DOWN){
+//            int temp_ScrollY = getScrollY();
+//            scrollTo(getScrollX(), getScrollY() + 1);
+//            scrollTo(getScrollX(), temp_ScrollY);
+//        }
+//        return super.onTouchEvent(event);
+//    }
 }

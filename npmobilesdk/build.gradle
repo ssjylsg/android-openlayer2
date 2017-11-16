@@ -24,7 +24,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile files('libs/fastjson-1.2.9.jar')
-    compile files('libs/tbs_sdk_third_v3.2.0.jar')
+
 }
 
 android {

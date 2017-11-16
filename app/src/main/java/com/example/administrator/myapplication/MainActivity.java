@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private NetPosaMap map;
     private Button addBtn, add_cluster_btn;
     private CustomerLayer layer;
-    private String clusterApiUrl = "data.json?v=12";
+    private String clusterApiUrl = "http://192.168.60.216:82/pmvp/api/getgpsinfoofdir?userid=3";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,9 +70,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         loadMap();
 
-        ((Button) findViewById(R.id.data_btn)).setOnClickListener(new View.OnClickListener() {
+//        ((Button) findViewById(R.id.data_btn)).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {clusterData();
+//            }
+//        });
+        clusterData();
+        clusterLayer.addOverlaysForMobile(new ClusterParmeters(clusterApiUrl,new Image("img/marker.png", new Size(21, 25))));
+
+        GeocoderHelper.getPoint("http://192.168.60.242:8088/netposa", "公安局", new NPCallBackFunction<List<Point>>() {
             @Override
-            public void onClick(View v) {clusterData();
+            public void onCallBack(List<Point> data) {
+                showMessage("提示", data.size() + "");
             }
         });
     }
@@ -92,8 +101,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         layer = new CustomerLayer("测试");
         // 将图层添加到地图
         map.addLayer(layer);
-
-
     }
     private void mapAddClick(){
         map.addEventListener(Constants.EVENT_TYPE_MAP_CLICK, new NPEventListener() {
@@ -101,17 +108,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void processEvent(EventObject sender, EventArgs e) {
                 Object[] lonlat = (Object[])e.getArgs();
                 android.util.Log.i("map",e.toString());
+             //   showMessage("提示",lonlat[0]+","+lonlat[1]);
                 double lon = Double.parseDouble(lonlat[0].toString());
                 double lat = Double.parseDouble(lonlat[1].toString());
-                Circle  circle = new Circle(new Point(lon,lat),1000,null);
-                layer.addOverlay(circle);
-                circle.getWKT(new com.netposa.npmobilesdk.event.NPCallBackFunction<String>() {
-                    @Override
-                    public void onCallBack(String data) {
-                        showMessage("提示",data);
-                        map.removeEventListener(Constants.EVENT_TYPE_MAP_CLICK);
-                    }
-                });
+                testAddMarker(new Point(lon,lat));
+//                Circle  circle = new Circle(new Point(lon,lat),1000,null);
+//                layer.addOverlay(circle);
+//                circle.getWKT(new com.netposa.npmobilesdk.event.NPCallBackFunction<String>() {
+//                    @Override
+//                    public void onCallBack(String data) {
+//                        showMessage("提示",data);
+//                        map.removeEventListener(Constants.EVENT_TYPE_MAP_CLICK);
+//                    }
+//                });
             }
         });
     }
@@ -122,11 +131,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    private void testAddMarker() {
+    private void testAddMarker(Point point) {
 
         // 创建一个Marker覆盖物
-        Marker marker = new Marker(
-                new Point(116.37948369818618, 39.871976142236186),
+        if(point == null)
+        {
+            point = new Point(116.37948369818618, 39.871976142236186);
+        }
+        Marker marker = new Marker(point
+                ,
                 new MarkerStyle("img/marker.png", 21.0, 25.0));
         // 添加Maker到创建好的自定义图层
         layer.addOverlay(marker);
@@ -182,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // addMarker();
                 // testMeasure();
                 //testGeocoderHelper();
-                mapAddClick();
+               mapAddClick();
                 // this.map.setBaiduTrafficLayerVisable(false);
                 break;
             case R.id.add_cluster_btn:
@@ -200,6 +213,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
     }
+
     ClusterLayer clusterLayer;
     ClusterMarkerList list;
     ClusterMarkerList list1;
@@ -305,7 +319,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         double lon = 116.3427702718185;
         double lat = 39.89369592052587;
         this.map.setCenter(new Point(lon,lat));
-        Point randomPoint = new Point(lon + Math.random() * Math.pow(-1, 3) * 0.1, lat + Math.random() * Math.pow(-1, 3) * 0.1);
+        Point randomPoint = new Point(lon,lat);//new Point(lon + Math.random() * Math.pow(-1, 3) * 0.1, lat + Math.random() * Math.pow(-1, 3) * 0.1);
         final Marker marker = new Marker(randomPoint, new MarkerStyle(
                 "img/marker.png", 21.0, 25.0
         ));

@@ -2,15 +2,15 @@ package com.netposa.npmobilesdk.map;
 
 
 
-import android.app.Activity;
+
 import android.content.Context;
-import android.graphics.PixelFormat;
+
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.JavascriptInterface;
-import com.tencent.smtt.sdk.CookieManager;
-import com.tencent.smtt.sdk.CookieSyncManager;
-import com.tencent.smtt.sdk.QbSdk;
-import com.tencent.smtt.sdk.WebView;
-import com.tencent.smtt.sdk.WebSettings;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.netposa.npmobilesdk.Entity;
@@ -58,18 +58,18 @@ public class NetPosaMap extends Entity {
     public static void initX5Environment(Context context) {
         // 防止闪烁
         //activity.getWindow().setFormat(PixelFormat.TRANSLUCENT);
-        QbSdk.PreInitCallback cb = new QbSdk.PreInitCallback() {
-            @Override
-            public void onViewInitFinished(boolean arg0) {
-
-            }
-
-            @Override
-            public void onCoreInitFinished() {
-
-            }
-        };
-        QbSdk.initX5Environment(context, cb);
+//        QbSdk.PreInitCallback cb = new QbSdk.PreInitCallback() {
+//            @Override
+//            public void onViewInitFinished(boolean arg0) {
+//
+//            }
+//
+//            @Override
+//            public void onCoreInitFinished() {
+//
+//            }
+//        };
+//        QbSdk.initX5Environment(context, cb);
     }
     /**
      * NetPosaMap 构造函数

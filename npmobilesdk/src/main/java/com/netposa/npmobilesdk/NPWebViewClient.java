@@ -1,11 +1,6 @@
 package com.netposa.npmobilesdk;
 
-//import android.webkit.WebResourceError;
-//import android.webkit.WebResourceRequest;
-//import android.webkit.WebView;
-
-import com.tencent.smtt.sdk.WebView;
-
+import android.webkit.WebView;
 import com.netposa.npmobilesdk.jsbridge.BridgeWebView;
 import com.netposa.npmobilesdk.jsbridge.BridgeWebViewClient;
 import com.netposa.npmobilesdk.map.NetPosaMap;

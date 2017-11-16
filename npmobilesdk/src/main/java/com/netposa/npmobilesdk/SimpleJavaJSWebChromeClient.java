@@ -1,17 +1,13 @@
 package com.netposa.npmobilesdk;
 
 import android.app.AlertDialog;
-//import android.webkit.JsPromptResult;
-//import android.webkit.JsResult;
-//import android.webkit.WebChromeClient;
-//import android.webkit.WebView;
+import android.webkit.JsPromptResult;
+import android.webkit.JsResult;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
 
 import com.netposa.npmobilesdk.map.NetPosaMap;
-import com.netposa.npmobilesdk.utils.Util;
-import com.tencent.smtt.export.external.interfaces.JsPromptResult;
-import com.tencent.smtt.export.external.interfaces.JsResult;
-import com.tencent.smtt.sdk.WebChromeClient;
-import com.tencent.smtt.sdk.WebView;
+
 /**
  * SimpleJavaJSWebChromeClient
  */
