@@ -17,7 +17,7 @@ import java.util.ArrayList;
  * 聚合图层
  */
 public class ClusterLayer extends Layer {
-    private ClusterLayerOptions options;
+    private BaseClusterLayerOptions options;
 
     /**
      * 聚合图层
@@ -25,7 +25,7 @@ public class ClusterLayer extends Layer {
      * @param name    图层名称
      * @param options 参数配置
      */
-    public ClusterLayer(String name, ClusterLayerOptions options) {
+    public ClusterLayer(String name, BaseClusterLayerOptions options) {
         super(name);
         this.setOptions(options);
         this.setClassName("NPMobile.Layers.ClusterLayer");
@@ -85,11 +85,11 @@ public class ClusterLayer extends Layer {
     }
 
 
-    public ClusterLayerOptions getOptions() {
+    public BaseClusterLayerOptions getOptions() {
         return options;
     }
 
-    public void setOptions(ClusterLayerOptions options) {
+    public void setOptions(BaseClusterLayerOptions options) {
         this.options = options;
     }
 
@@ -107,5 +107,12 @@ public class ClusterLayer extends Layer {
 
     public void addOverlaysForMobile(ClusterParmeters parmeters){
         this.ExecuteJs("addOverlaysForMobile", parmeters);
+    }
+
+    /**
+     * 清除聚合点位
+     */
+    public void removeAllOverlays(){
+        this.ExecuteJs("removeAllOverlays");
     }
 }
