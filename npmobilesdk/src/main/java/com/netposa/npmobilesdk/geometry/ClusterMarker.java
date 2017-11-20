@@ -17,6 +17,7 @@ public class ClusterMarker extends Entity {
     private Point point;
     private Layer layer;
     private Image image;
+    private String markType;
     @JSONField(serialize = false)
     private Object tag;
 
@@ -32,10 +33,10 @@ public class ClusterMarker extends Entity {
     }
 
     /**
-     *
-     * @param id
-     * @param point
-     * @param image
+     * 此方法为安卓缓存聚合点设置
+     * @param id id  用于页面与安卓端识别个体 不能重复
+     * @param point 坐标点
+     * @param image 图片，可为null
      */
     public ClusterMarker(String id,Point point,Image image)    {
         super(id);
@@ -44,6 +45,16 @@ public class ClusterMarker extends Entity {
         this.setImage(image);
     }
 
+    /**
+     *
+     * @param point 坐标点
+     * @param image 可为null
+     * @param markType 分组信息
+     */
+    public ClusterMarker(Point point,Image image,String markType){
+        this(point,image);
+        this.setMarkType(markType);
+    }
     public ClusterMarker setLayer(Layer layer) {
         this.layer = layer;
         return this;
@@ -113,5 +124,21 @@ public class ClusterMarker extends Entity {
      */
     public void setTag(Object objectTag) {
           tag = objectTag;
+    }
+
+    /**
+     * 获取分组信息
+     * @return
+     */
+    public String getMarkType() {
+        return markType;
+    }
+
+    /**
+     *  设置分组信息
+     * @param markType
+     */
+    public void setMarkType(String markType) {
+        this.markType = markType;
     }
 }

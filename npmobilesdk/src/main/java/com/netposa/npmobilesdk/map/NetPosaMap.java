@@ -34,7 +34,10 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -50,6 +53,8 @@ public class NetPosaMap extends Entity {
     private EventManager manager;
     private boolean isDebug = false;
     private String outMsg;
+    @JSONField(serialize = false)
+    private Map<String,Layer> layers;
 
     /**
      * 基于X5
@@ -82,6 +87,7 @@ public class NetPosaMap extends Entity {
     public NetPosaMap(BridgeWebView webView, String mapConfig, String mapUrl,String clusterUrl) {
         this.setClassName("NPMobile.Map");
         this.mapConfig = mapConfig;
+        this.layers = new Hashtable<>();
 
         WebSettings webSettings = webView.getSettings();
 
@@ -320,8 +326,12 @@ public class NetPosaMap extends Entity {
      * @param layer
      */
     public void addLayer(Layer layer) {
+        if(this.layers.get(layer.getName()) != null){
+           throw new IllegalArgumentException("图层名称相同:"+layer.getName());
+        }
         this.ExecuteJs("addLayer", layer);
         layer.setMap(this);
+        this.layers.put(layer.getName(),layer);
     }
 
     public boolean parseJsonFromJs(String msg) {
