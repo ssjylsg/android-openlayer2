@@ -55,6 +55,16 @@ public class ClusterMarker extends Entity {
         this(point,image);
         this.setMarkType(markType);
     }
+
+    /**
+     *
+     * @param point 坐标点
+     * @param markType 分组信息
+     */
+    public ClusterMarker(Point point,String markType){
+        this(point,null,markType);
+    }
+
     public ClusterMarker setLayer(Layer layer) {
         this.layer = layer;
         return this;
