@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button addBtn, add_cluster_btn;
     private CustomerLayer layer;
     private String clusterApiUrl = "http://192.168.60.216:82/pmvp/api/getgpsinfoofdir?userid=3";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +69,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         webView.debug = true;
 
-        map = new NetPosaMap(webView, "mapConfig.json", "http://192.168.62.63:807/mobile/dist/index_c.html", clusterApiUrl);
+        map = new NetPosaMap(webView, "mapConfig.json",
+         "http://192.168.62.63:807/mobile/dist/index_c.html", null);
 
         loadMap();
 
@@ -78,14 +80,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //            }
 //        });
         //clusterData();
-       // clusterLayer.addOverlaysForMobile(new ClusterParmeters(clusterApiUrl,new Image("img/marker.png", new Size(21, 25))));
+        // clusterLayer.addOverlaysForMobile(new ClusterParmeters(clusterApiUrl,new Image("img/marker.png", new Size(21, 25))));
 
-        GeocoderHelper.getPoint("http://192.168.60.242:8088/netposa", "公安局", new NPCallBackFunction<List<Point>>() {
-            @Override
-            public void onCallBack(List<Point> data) {
-                showMessage("提示", data.size() + "");
-            }
-        });
+        // GeocoderHelper.getPoint("http://192.168.60.242:8088/netposa", "公安局", new NPCallBackFunction<List<Point>>() {
+        //     @Override
+        //     public void onCallBack(List<Point> data) {
+        //         showMessage("提示", data.size() + "");
+        //     }
+        // });
     }
 
     @Override
@@ -104,16 +106,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // 将图层添加到地图
         map.addLayer(layer);
     }
-    private void mapAddClick(){
+
+    private void mapAddClick() {
         map.addEventListener(Constants.EVENT_TYPE_MAP_CLICK, new NPEventListener() {
             @Override
             public void processEvent(EventObject sender, EventArgs e) {
-                Object[] lonlat = (Object[])e.getArgs();
-                android.util.Log.i("map",e.toString());
-             //   showMessage("提示",lonlat[0]+","+lonlat[1]);
+                Object[] lonlat = (Object[]) e.getArgs();
+                android.util.Log.i("map", e.toString());
+                //   showMessage("提示",lonlat[0]+","+lonlat[1]);
                 double lon = Double.parseDouble(lonlat[0].toString());
                 double lat = Double.parseDouble(lonlat[1].toString());
-                testAddMarker(new Point(lon,lat));
+                testAddMarker(new Point(lon, lat));
 //                Circle  circle = new Circle(new Point(lon,lat),1000,null);
 //                layer.addOverlay(circle);
 //                circle.getWKT(new com.netposa.npmobilesdk.event.NPCallBackFunction<String>() {
@@ -136,13 +139,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void testAddMarker(Point point) {
 
         // 创建一个Marker覆盖物
-        if(point == null)
-        {
+        if (point == null) {
             point = new Point(116.37948369818618, 39.871976142236186);
         }
-        Marker marker = new Marker(point
-                ,
-                new MarkerStyle("img/marker.png", 21.0, 25.0));
+        Marker marker = new Marker(point, new MarkerStyle("img/marker.png", 21.0, 25.0));
         // 添加Maker到创建好的自定义图层
         layer.addOverlay(marker);
         // 为Marker设置点击监听
@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void processEvent(EventObject<ClusterMarker> sender, EventArgs e) {
                 //sender.getSource().changeStyle(new MarkerStyle("img/Flag.png", 21.0, 25.0));
-                showMessage("提示",sender.getSource().getMarkType());
+                showMessage("提示", sender.getSource().getMarkType());
             }
         });
 
@@ -195,11 +195,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.add_btn:
-                 addMarker();
+                addMarker();
                 // testMeasure();
                 //testGeocoderHelper();
-              // mapAddClick();
-              //  clusterLayer.removeAllOverlays();
+                // mapAddClick();
+                //  clusterLayer.removeAllOverlays();
                 // this.map.setBaiduTrafficLayerVisable(false);
                 break;
             case R.id.add_cluster_btn:
@@ -209,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                clusterLayer.addOverlayList(list1,true);
                 cluster_group();
 
-               // clusterLayer.addOverlaysForMobile(new ClusterParmeters(clusterApiUrl,new Image("img/marker.png", new Size(21, 25))));
+                // clusterLayer.addOverlaysForMobile(new ClusterParmeters(clusterApiUrl,new Image("img/marker.png", new Size(21, 25))));
 
                 //this.showMessage("提示","耗时:"+(new java.util.Date().getTime() - start));
                 break;
@@ -223,35 +223,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ClusterMarkerList list;
     ClusterMarkerList list1;
 
-    private void cluster_group(){
+    private void cluster_group() {
         double lon = 116.3427702718185;
         double lat = 39.89369592052587;
-        map.setCenter(new Point(lon,lat));
+        map.setCenter(new Point(lon, lat));
         GroupClusterLayerOptions options = new GroupClusterLayerOptions();
         options.setFontColor("#000000");
         options.setFontSize("23px");
-        options.addClusterImage("偶数",new Image("img/cluster_marker_bg.png", new Size(32, 32)));
-        options.addClusterImage("奇数",new Image("img/Flag.png", new Size(32, 32)));
-        options.addSingleImage("偶数",new Image("img/marker-gold.png", new Size(21, 25)));
-        options.addSingleImage("奇数",new Image("img/marker-green.png", new Size(21, 25)));
+
+        options.addClusterImage("偶数", new Image("img/cluster_marker_bg.png", new Size(32, 32)));
+        options.addClusterImage("奇数", new Image("img/Flag.png", new Size(32, 32)));
+
+        options.addSingleImage("偶数", new Image("img/marker-gold.png", new Size(21, 25)));
+        options.addSingleImage("奇数", new Image("img/marker-green.png", new Size(21, 25)));
         options.setMinZoom(6);
-        if(clusterLayer == null){
+        if (clusterLayer == null) {
             clusterLayer = new ClusterLayer("聚合图层测试", options);
             this.map.addLayer(clusterLayer);
         }
 
         ArrayList<ClusterMarker> list = new ArrayList<ClusterMarker>();
-        for (int i=0;i<10;i++){
+        for (int i = 0; i < 10; i++) {
             Point p = new Point(lon + Math.random() * Math.pow(-1, i) * 0.1,
                     lat + Math.random() * Math.pow(-1, i + 1) * 0.1);
-            String marker = i %2 == 0 ? "偶数":"奇数";
-            list.add(new ClusterMarker(p,marker));
+            String marker = i % 2 == 0 ? "偶数" : "奇数";
+            list.add(new ClusterMarker(p, marker));
         }
         clusterLayer.addClusterMarkers(list);
         testAddClusterMarker();
     }
 
-    private  void clusterData() {
+    private void clusterData() {
         double lon = 116.3427702718185;
         double lat = 39.89369592052587;
 
@@ -273,18 +275,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Image image = new Image("img/marker.png", new Size(21, 25));
 
 
-        list  = new ClusterMarkerList(image);
-        for (int i =0;i<20000;i++){
+         list = new ClusterMarkerList(image);
+        for (int i = 0; i < 20000; i++) {
             list.addMarker(new Point(lon + Math.random() * Math.pow(-1, i) * 0.1,
-                    lat + Math.random() * Math.pow(-1, i + 1) * 0.1),null,clusterLayer);
+                    lat + Math.random() * Math.pow(-1, i + 1) * 0.1), null, clusterLayer);
         }
+        clusterLayer.addOverlayList(list,true);
 
-
-        list1 = new ClusterMarkerList(image);
-        for (int i =0;i<20000;i++){
-            list1.addMarker(new Point(lon + Math.random() * Math.pow(-1, i) * 0.1,
-                    lat + Math.random() * Math.pow(-1, i + 1) * 0.1),null,clusterLayer);
-        }
+        // list1 = new ClusterMarkerList(image);
+        // for (int i = 0; i < 20000; i++) {
+        //     list1.addMarker(new Point(lon + Math.random() * Math.pow(-1, i) * 0.1,
+        //             lat + Math.random() * Math.pow(-1, i + 1) * 0.1), null, clusterLayer);
+        // }
 //        new Thread(new Runnable() {
 //            @Override
 //            public void run() {
@@ -352,8 +354,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void addMarker() {
         double lon = 116.3427702718185;
         double lat = 39.89369592052587;
-        this.map.setCenter(new Point(lon,lat));
-        Point randomPoint = new Point(lon,lat);//new Point(lon + Math.random() * Math.pow(-1, 3) * 0.1, lat + Math.random() * Math.pow(-1, 3) * 0.1);
+        this.map.setCenter(new Point(lon, lat));
+        Point randomPoint = new Point(lon, lat);//new Point(lon + Math.random() * Math.pow(-1, 3) * 0.1, lat + Math.random() * Math.pow(-1, 3) * 0.1);
         final Marker marker = new Marker(randomPoint, new MarkerStyle(
                 "img/marker.png", 21.0, 25.0
         ));
@@ -365,8 +367,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void processEvent(EventObject<Marker> sender, EventArgs e) {
                         //final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                         //builder.setTitle("单个点位点击事件").setMessage(sender.getSource().getPoint().toString()).show();
-                       // layer.removeOverlay(marker);
-                        showMessage("提示","单击事件");
+                        // layer.removeOverlay(marker);
+                        showMessage("提示", "单击事件");
                     }
                 }
         );

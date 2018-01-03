@@ -80,8 +80,8 @@ public class NetPosaMap extends Entity {
      * NetPosaMap 构造函数
      *
      * @param webView   webView
-     * @param mapConfig 地图配置地址
-     * @param mapUrl    地图地址
+     * @param mapConfig 地图配置地址 mapconfig.json
+     * @param mapUrl    地图地址 index_c.html
      * @param clusterUrl  请求聚合数据地址
      */
     public NetPosaMap(BridgeWebView webView, String mapConfig, String mapUrl,String clusterUrl) {
@@ -481,7 +481,20 @@ public class NetPosaMap extends Entity {
             }
         });
     }
-    public void initCluster(String url){
-        this.loadUrl("javascript:initCluster('"+url+"')");
+//    public void initCluster(String url){
+//        this.loadUrl("javascript:initCluster('"+url+"')");
+//    }
+
+    /**
+     * 矢量影像切换，显示矢量图出层
+     */
+    public void showVectorLayer(){
+        this.ExecuteJs("showVectorLayer");
+    }
+    /**
+     * 矢量影像切换，显示影像图出层
+     */
+    public void showSattilateLayer(){
+        this.ExecuteJs("showSattilateLayer");
     }
 }
