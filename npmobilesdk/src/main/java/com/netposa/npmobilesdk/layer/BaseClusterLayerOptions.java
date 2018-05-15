@@ -21,6 +21,7 @@ public abstract class BaseClusterLayerOptions {
     private String fontSize;
     private String customLabelFontColor;
     private Size customLabelOffset;
+    private Integer clusterMarkerClickZoom = null;
     private List<ClusterStatisticInfo> statistics;
     public int getSelectZoom() {
         return selectZoom;
@@ -112,5 +113,17 @@ public abstract class BaseClusterLayerOptions {
      */
     public void setStatistics(List<ClusterStatisticInfo> statistics) {
         this.statistics = statistics;
+    }
+
+    public Integer getClusterMarkerClickZoom() {
+        return clusterMarkerClickZoom;
+    }
+
+    /**
+     * 设置聚合事件响应的地图层级 
+     * @param clusterMarkerClickZoom
+     */
+    public void setClusterMarkerClickZoom(Integer clusterMarkerClickZoom) {
+        this.clusterMarkerClickZoom = clusterMarkerClickZoom;
     }
 }

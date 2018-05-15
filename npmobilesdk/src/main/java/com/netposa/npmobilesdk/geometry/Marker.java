@@ -27,6 +27,7 @@ public class Marker extends Curve {
 
     public void setOptions(MarkerStyle options) {
         this.options = options;
+        this.ExecuteJs("setStyle",options);
     }
 
 

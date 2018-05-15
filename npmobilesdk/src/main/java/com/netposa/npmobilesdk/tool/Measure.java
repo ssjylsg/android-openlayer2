@@ -1,7 +1,13 @@
 package com.netposa.npmobilesdk.tool;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.netposa.npmobilesdk.Entity;
+import com.netposa.npmobilesdk.event.EventArgs;
+import com.netposa.npmobilesdk.event.EventObject;
+import com.netposa.npmobilesdk.event.MeasureCompletedListener;
+import com.netposa.npmobilesdk.event.MeasureEventArgs;
+import com.netposa.npmobilesdk.event.NPEventListener;
 import com.netposa.npmobilesdk.jsbridge.CallBackFunction;
 import com.netposa.npmobilesdk.map.NetPosaMap;
 
@@ -12,6 +18,7 @@ import com.netposa.npmobilesdk.map.NetPosaMap;
 public class Measure extends Entity {
 
     private NetPosaMap map;
+    private MeasureState state;
 
     /**
      * 测量工具类
@@ -35,15 +42,20 @@ public class Measure extends Entity {
      * @param mode 面积测量:Constants.MeasureMode_AREA Constants.
      *             距离测量:MeasureMode_DISTANCE
      */
-    public void setMode(String mode) {
+    public void setMode(String mode, final MeasureCompletedListener listener) {
         //final NPCallBackFunction<String> temp = callBackFunction;
+        state = MeasureState.UnMeasure;
         this.ExecuteJs("setMode",null, mode);
-//        this.events.put("callback", new NPEventListener() {
-//            @Override
-//            public void processEvent(EventObject sender, EventArgs e) {
-//
-//            }
-//        });
+        this.events.clear();
+        this.events.put("MeasureCompleted", new NPEventListener() {
+            @Override
+            public void processEvent(EventObject sender, EventArgs e) {
+                if(listener != null){
+                    JSONObject obj = (JSONObject)com.alibaba.fastjson.JSONObject.parse (((Object[])e.getArgs())[0].toString());
+                    listener.processEvent((Measure)sender.getSource(),new MeasureEventArgs(obj.getDouble("measure"),obj.getString("unit"),MeasureState.Measured));
+                }
+            }
+        });
     }
 
     private void ExecuteJs(String method, CallBackFunction callBack, Object... args) {
@@ -55,5 +67,8 @@ public class Measure extends Entity {
      */
     public void remove() {
         this.ExecuteJs("remove", null);
+    }
+    public void destory(){
+        this.ExecuteJs("destory", null);
     }
 }

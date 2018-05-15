@@ -4,6 +4,7 @@ import com.netposa.npmobilesdk.Entity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  *  工具类
@@ -15,7 +16,13 @@ public class Util {
     public static Entity getEntity(String id) {
         return _entities.get(id);
     }
-
+    public static List<Entity> getEntities(String[] ids) {
+        ArrayList<Entity> list = new ArrayList<>(ids.length);
+        for(String id :ids){
+            list.add(getEntity(id));
+        }
+        return list;
+    }
     public static void AddEntity(Entity entity) {
         _entities.put(entity.getId(), entity);
     }

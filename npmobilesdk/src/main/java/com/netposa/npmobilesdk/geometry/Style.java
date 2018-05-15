@@ -11,7 +11,36 @@ public class Style {
     private Double labelYOffset = 0.0;
     private String fontColor = "white";
     private String fontSize = "14px";
+
+    public String getLabelOutlineColor() {
+        return labelOutlineColor;
+    }
+
+    public void setLabelOutlineColor(String labelOutlineColor) {
+        this.labelOutlineColor = labelOutlineColor;
+    }
+
+    public Double getLabelOutlineWidth() {
+        return labelOutlineWidth;
+    }
+
+    public void setLabelOutlineWidth(Double labelOutlineWidth) {
+        this.labelOutlineWidth = labelOutlineWidth;
+    }
+
+    public String getDisplay() {
+        return display;
+    }
+
+    public void setDisplay(String display) {
+        this.display = display;
+    }
+
+    private String labelOutlineColor = "white";
+    private Double labelOutlineWidth = null;
+    private String display;
     private String fontFamily ;
+    private Double rotation;
 
     public String toString() {
         return com.alibaba.fastjson.JSON.toJSONString(this);
@@ -21,8 +50,13 @@ public class Style {
         return label;
     }
 
+    /**
+     * 设置文字 文字颜色默认red,可以通过setFontColor设置字体颜色
+     * @param label
+     */
     public void setLabel(String label) {
         this.label = label;
+        setFontColor("red");
     }
 
     public String getLabelAlign() {
@@ -33,10 +67,18 @@ public class Style {
         this.labelAlign = labelAlign;
     }
 
+    /**
+     *
+     * @return
+     */
     public Double getLabelXOffset() {
         return labelXOffset;
     }
 
+    /**
+     * 设置文字X偏移量
+     * @param labelXOffset
+     */
     public void setLabelXOffset(Double labelXOffset) {
         this.labelXOffset = labelXOffset;
     }
@@ -45,6 +87,10 @@ public class Style {
         return labelYOffset;
     }
 
+    /**
+     * 设置文字Y偏移量
+     * @param labelYOffset
+     */
     public void setLabelYOffset(Double labelYOffset) {
         this.labelYOffset = labelYOffset;
     }
@@ -53,6 +99,10 @@ public class Style {
         return fontColor;
     }
 
+    /**
+     * 字体颜色
+     * @param fontColor
+     */
     public void setFontColor(String fontColor) {
         this.fontColor = fontColor;
     }
@@ -61,6 +111,10 @@ public class Style {
         return fontSize;
     }
 
+    /**
+     * 字体大小
+     * @param fontSize
+     */
     public void setFontSize(String fontSize) {
         this.fontSize = fontSize;
     }
@@ -69,7 +123,24 @@ public class Style {
         return fontFamily;
     }
 
+    /**
+     * 字体
+     * @param fontFamily
+     */
     public void setFontFamily(String fontFamily) {
         this.fontFamily = fontFamily;
     }
+
+    public Double getRotation() {
+        return rotation;
+    }
+
+    /**
+     * 设置旋转角度
+     * @param rotation
+     */
+    public void setRotation(Double rotation) {
+        this.rotation = rotation;
+    }
+
 }

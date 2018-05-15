@@ -21,6 +21,7 @@ import com.netposa.npmobilesdk.event.EventCallBackArgs;
 import com.netposa.npmobilesdk.event.EventManager;
 import com.netposa.npmobilesdk.event.NPEventListener;
 import com.netposa.npmobilesdk.geometry.Point;
+import com.netposa.npmobilesdk.geometry.PolylineStyle;
 import com.netposa.npmobilesdk.jsbridge.BridgeHandler;
 import com.netposa.npmobilesdk.jsbridge.BridgeWebView;
 import com.netposa.npmobilesdk.jsbridge.CallBackFunction;
@@ -496,5 +497,15 @@ public class NetPosaMap extends Entity {
      */
     public void showSattilateLayer(){
         this.ExecuteJs("showSattilateLayer");
+    }
+
+    /**
+     *  道路搜索
+     * @param road 道路名称
+     * @param netposaServer 务地址 http://192.168.60.242:8088/netposa/
+     * @param style 道路样式
+     */
+    public void searchRoad(String road,String netposaServer,PolylineStyle style) {
+        this.ExecuteJs("searchRoad", road, netposaServer, style);
     }
 }
