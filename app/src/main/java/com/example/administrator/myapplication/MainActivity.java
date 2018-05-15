@@ -16,14 +16,19 @@ import com.netposa.npmobilesdk.NPCallBackFunction;
 import com.netposa.npmobilesdk.common.Constants;
 import com.netposa.npmobilesdk.event.EventArgs;
 import com.netposa.npmobilesdk.event.EventObject;
+import com.netposa.npmobilesdk.event.MeasureCompletedListener;
+import com.netposa.npmobilesdk.event.MeasureEventArgs;
 import com.netposa.npmobilesdk.event.NPEventListener;
 import com.netposa.npmobilesdk.geometry.Circle;
 import com.netposa.npmobilesdk.geometry.ClusterMarker;
 import com.netposa.npmobilesdk.geometry.ClusterMarkerList;
 import com.netposa.npmobilesdk.geometry.ClusterParmeters;
+import com.netposa.npmobilesdk.geometry.LineString;
+import com.netposa.npmobilesdk.geometry.LineStringStyle;
 import com.netposa.npmobilesdk.geometry.Marker;
 import com.netposa.npmobilesdk.geometry.MarkerStyle;
 import com.netposa.npmobilesdk.geometry.Point;
+import com.netposa.npmobilesdk.geometry.PolylineStyle;
 import com.netposa.npmobilesdk.jsbridge.BridgeWebView;
 import com.netposa.npmobilesdk.layer.ClusterLayer;
 import com.netposa.npmobilesdk.layer.ClusterLayerOptions;
@@ -43,6 +48,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -69,9 +75,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         webView.debug = true;
 
-        map = new NetPosaMap(webView, "mapConfig.json",
-         "http://192.168.62.63:807/mobile/dist/index_c.html", null);
-
+        map = new NetPosaMap(webView, "mapConfig.json", "http://192.168.60.45:807/mobile/dist/index_c.html", null);
         loadMap();
 
 //        ((Button) findViewById(R.id.data_btn)).setOnClickListener(new View.OnClickListener() {
@@ -88,6 +92,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //         showMessage("提示", data.size() + "");
         //     }
         // });
+
+        points.add(new Point(117.065808367, 40.163818078886));
+        points.add(new Point(117.26202823939, 40.135873688834));
+        points.add(new Point(117.04098582979, 40.056228370046));
     }
 
     @Override
@@ -105,6 +113,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         layer = new CustomerLayer("测试");
         // 将图层添加到地图
         map.addLayer(layer);
+
+        map.addEventListener(Constants.EVENT_TYPE_MAP_MOVEEND, new NPEventListener() {
+            @Override
+            public void processEvent(EventObject sender, EventArgs e) {
+                showMessage("提示","地图移动");
+            }
+        });
     }
 
     private void mapAddClick() {
@@ -184,6 +199,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 builder.setTitle("提示").setMessage("加载成功").show();
             }
         });
+
+        clusterLayer.addEventListener(Constants.EVENT_TYPE_CLUSTERCLICK, new NPEventListener<ClusterLayer>() {
+                    @Override
+                    public void processEvent(EventObject<ClusterLayer> sender, EventArgs e) {
+                        showMessage("提示",((ArrayList)e.getArgs()).size()+"条数据");
+                    }
+                }
+        );
     }
 
     private void intListener() {
@@ -191,12 +214,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         add_cluster_btn.setOnClickListener(this);
     }
 
+    int index = 0;
+    private ArrayList<Point> points = new ArrayList<>();
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.add_btn:
-                addMarker();
-                // testMeasure();
+//                if(index == points.size()){
+//                    index = 0;
+//                }
+//                map.panTo(points.get(index++));
+
+                // map.searchRoad("西安","http://192.168.60.242:8088/netposa/",new PolylineStyle(10,"blue"));
+                // addMarker();
+                testMeasure();
                 //testGeocoderHelper();
                 // mapAddClick();
                 //  clusterLayer.removeAllOverlays();
@@ -204,10 +236,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.add_cluster_btn:
                 long start = new java.util.Date().getTime();
-//                clusterData();
+                clusterData();
 //                clusterLayer.addOverlayList(list,false);
 //                clusterLayer.addOverlayList(list1,true);
-                cluster_group();
+                //cluster_group();
 
                 // clusterLayer.addOverlaysForMobile(new ClusterParmeters(clusterApiUrl,new Image("img/marker.png", new Size(21, 25))));
 
@@ -261,6 +293,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ClusterLayerOptions options = new ClusterLayerOptions();
         options.setFontColor("#000000");
         options.setFontSize("23px");
+        options.setClusterMarkerClickZoom(11);
         options.setClusterImage(new Image("img/Flag.png", new Size(32, 32)));
         List<ClusterStatisticInfo> statisticInfos = new ArrayList<>();
         statisticInfos.add(new ClusterStatisticInfo(lon, lat, "50"));
@@ -275,12 +308,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Image image = new Image("img/marker.png", new Size(21, 25));
 
 
-         list = new ClusterMarkerList(image);
+        list = new ClusterMarkerList(image);
         for (int i = 0; i < 20000; i++) {
             list.addMarker(new Point(lon + Math.random() * Math.pow(-1, i) * 0.1,
                     lat + Math.random() * Math.pow(-1, i + 1) * 0.1), null, clusterLayer);
         }
-        clusterLayer.addOverlayList(list,true);
+        clusterLayer.addOverlayList(list, true);
 
         // list1 = new ClusterMarkerList(image);
         // for (int i = 0; i < 20000; i++) {
@@ -329,8 +362,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void testMeasure() {
+        List<Point> list =
+                Arrays.asList(new Point[]{new Point(116.44622466238592, 39.898044516377375)
+                        , new Point(116.44742988998291, 39.89844240091022), new Point(116.44758066337462, 39.89757032364166)});
+        LineStringStyle style = new LineStringStyle();
+        layer.addOverlay(new LineString(list, style));
+        map.setCenter(list.get(0));
+        map.SetZoom(18);
+        addMarker(list.get(0));
         Measure measure = new Measure(this.map);
-        measure.setMode(Constants.MeasureMode_AREA); //MeasureMode_DISTANCE
+        measure.setMode(Constants.MeasureMode_DISTANCE, new MeasureCompletedListener() {
+            @Override
+            public void processEvent(Measure sender, MeasureEventArgs e) {
+                showMessage("提示", e.getTotal() + e.getUnit());
+            }
+        }); //MeasureMode_DISTANCE
     }
 
     Handler handler = new Handler();
@@ -351,15 +397,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-    private void addMarker() {
-        double lon = 116.3427702718185;
-        double lat = 39.89369592052587;
-        this.map.setCenter(new Point(lon, lat));
-        Point randomPoint = new Point(lon, lat);//new Point(lon + Math.random() * Math.pow(-1, 3) * 0.1, lat + Math.random() * Math.pow(-1, 3) * 0.1);
-        final Marker marker = new Marker(randomPoint, new MarkerStyle(
+    private void addMarker(Point point) {
+        double lon = point != null ? point.getLon() : 116.3427702718185;
+        double lat = point != null ? point.getLat() : 39.89369592052587;
+        Point randomPoint = new Point(lon, lat);
+        this.map.setCenter(randomPoint);
+        MarkerStyle style = new MarkerStyle(
                 "img/marker.png", 21.0, 25.0
-        ));
+        );
+        style.setRotation(30.0); // 设置旋转角度
+        style.setLabel("测试");   // 设置文字
+        style.setFontColor("red");  // 设置文字颜色
 
+
+        style.setLabelXOffset(-21.0 / 2); // 设置文字X轴偏移量
+        style.setLabelYOffset(-25.0 / 2); // 设置文字Y轴偏移量
+        final Marker marker = new Marker(randomPoint, style);
         layer.addOverlay(marker);
         // 添加点击事件
         marker.addEventListener(Constants.EVENT_TYPE_CLICK, new NPEventListener<Marker>() {
