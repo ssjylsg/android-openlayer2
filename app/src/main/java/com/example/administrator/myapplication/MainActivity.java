@@ -49,7 +49,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -114,14 +117,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // 将图层添加到地图
         map.addLayer(layer);
 
+    }
+    private void eventTest(){
+        final int[] index = {0};
         map.addEventListener(Constants.EVENT_TYPE_MAP_MOVEEND, new NPEventListener() {
             @Override
             public void processEvent(EventObject sender, EventArgs e) {
-                showMessage("提示","地图移动");
+                map.getCenter(new NPCallBackFunction<Point>() {
+                    @Override
+                    public void onCallBack(Point data) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Button btn = ((Button) findViewById(R.id.add_btn));
+                                btn.setText(Integer.toString(index[0]));
+                            }
+                        });
+                    }
+                });
             }
         });
-    }
+        final double lon = 116.34275725219732, lat = 39.89368404841079;
 
+        final Marker marker = new Marker(new Point(lon,lat), new MarkerStyle("img/marker.png", 21.0, 25.0));
+        // 添加Maker到创建好的自定义图层
+        layer.addOverlay(marker);
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Point point = new Point(lon + index[0] * 0.005, lat + index[0] * 0.005);
+                map.setCenter(point);
+                marker.setPoint(point);
+                index[0]++;
+            }
+        }, 500, 500);
+    }
     private void mapAddClick() {
         map.addEventListener(Constants.EVENT_TYPE_MAP_CLICK, new NPEventListener() {
             @Override
@@ -203,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         clusterLayer.addEventListener(Constants.EVENT_TYPE_CLUSTERCLICK, new NPEventListener<ClusterLayer>() {
                     @Override
                     public void processEvent(EventObject<ClusterLayer> sender, EventArgs e) {
-                        showMessage("提示",((ArrayList)e.getArgs()).size()+"条数据");
+                        showMessage("提示", ((ArrayList) e.getArgs()).size() + "条数据");
                     }
                 }
         );
@@ -235,8 +265,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // this.map.setBaiduTrafficLayerVisable(false);
                 break;
             case R.id.add_cluster_btn:
-                long start = new java.util.Date().getTime();
-                clusterData();
+                if (this.measure != null) {
+                    this.measure.remove();
+                    //this.measure.destory();
+                }
+//                long start = new java.util.Date().getTime();
+//                clusterData();
 //                clusterLayer.addOverlayList(list,false);
 //                clusterLayer.addOverlayList(list1,true);
                 //cluster_group();
@@ -246,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //this.showMessage("提示","耗时:"+(new java.util.Date().getTime() - start));
                 break;
             case R.id.data_btn:
-                clusterData();
+                // clusterData();
                 break;
         }
     }
@@ -366,11 +400,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Arrays.asList(new Point[]{new Point(116.44622466238592, 39.898044516377375)
                         , new Point(116.44742988998291, 39.89844240091022), new Point(116.44758066337462, 39.89757032364166)});
         LineStringStyle style = new LineStringStyle();
-        layer.addOverlay(new LineString(list, style));
+        style.setStrokeOpacity(0.2);
+        LineString lineString = new LineString(list, style);
+        layer.addOverlay(lineString);
+        lineString.addEventListener(Constants.EVENT_TYPE_CLICK, new NPEventListener() {
+            @Override
+            public void processEvent(EventObject sender, EventArgs e) {
+                showMessage("提示","ok");
+            }
+        });
         map.setCenter(list.get(0));
         map.SetZoom(18);
         addMarker(list.get(0));
-        Measure measure = new Measure(this.map);
+        measure = new Measure(this.map);
         measure.setMode(Constants.MeasureMode_DISTANCE, new MeasureCompletedListener() {
             @Override
             public void processEvent(Measure sender, MeasureEventArgs e) {
@@ -379,6 +421,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }); //MeasureMode_DISTANCE
     }
 
+    Measure measure = null;
     Handler handler = new Handler();
 
     private void testGeocoderHelper() {
