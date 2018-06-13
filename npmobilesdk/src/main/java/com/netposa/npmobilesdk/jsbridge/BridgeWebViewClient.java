@@ -58,9 +58,19 @@ public class BridgeWebViewClient extends WebViewClient {
             webView.setStartupMessage(null);
         }
     }
-
+    private boolean isPageError = false;
     @Override
     public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
         super.onReceivedError(view, errorCode, description, failingUrl);
+//        try {
+//            //java.net.URLEncoder.encode(description,"UTF-8")
+//            view.loadUrl("file:///android_asset/errorpage/maperror.html?errorCode="+description);
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+        if(!isPageError){
+            view.loadUrl("file:///android_asset/errorpage/maperror.html?errorCode="+errorCode);
+        }
+        isPageError = true;
     }
 }

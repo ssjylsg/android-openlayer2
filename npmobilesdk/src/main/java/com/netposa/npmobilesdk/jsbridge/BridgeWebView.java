@@ -79,12 +79,12 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge {
     void handlerReturnData(String url) {
         String functionName = BridgeUtil.getFunctionFromReturnUrl(url);
         CallBackFunction f = responseCallbacks.get(functionName);
-        if(f != null){
+        if (f != null) {
             String data = BridgeUtil.getDataFromReturnUrl(url);
             f.onCallBack(data);
             responseCallbacks.remove(functionName);
-        }else{
-            Log.e("路踩", functionName +"为空");
+        } else {
+            Log.e("路踩", functionName + "为空");
         }
     }
 
@@ -121,8 +121,10 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge {
             dispatchMessage(m);
         }
     }
+
     public boolean debug = false;
-     void dispatchMessage(Message m) {
+
+    void dispatchMessage(Message m) {
         String messageJson = m.toJson();
         String javascriptCommand = String.format("javascript:WebViewJavascriptBridge._handleMessageFromNative('%s',", messageJson) + m.getData() + ");";
 
@@ -136,6 +138,19 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge {
             if (debug) {
                 Log.i("MSG", javascriptCommand);
             }
+        } else {
+            final  String jsCmd = javascriptCommand;
+            this.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                        evaluateJavascript(jsCmd, null);
+                    } else {
+                        loadUrl(jsCmd);
+                    }
+                }
+            });
+
         }
     }
 
@@ -240,4 +255,6 @@ public class BridgeWebView extends WebView implements WebViewJavascriptBridge {
 //        }
 //        return super.onTouchEvent(event);
 //    }
+
+
 }

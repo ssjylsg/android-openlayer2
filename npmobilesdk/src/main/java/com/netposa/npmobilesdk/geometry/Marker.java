@@ -19,6 +19,7 @@ public class Marker extends Curve {
 
     public void setPoint(Point point) {
         this.point = point;
+        this.ExecuteJs("setPoint",point);
     }
 
     public MarkerStyle getOptions() {

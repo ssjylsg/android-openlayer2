@@ -7,7 +7,6 @@ import com.netposa.npmobilesdk.event.NPEventListener;
 import com.netposa.npmobilesdk.layer.Layer;
 import com.netposa.npmobilesdk.map.NetPosaMap;
 import com.netposa.npmobilesdk.utils.Image;
-import com.netposa.npmobilesdk.utils.Util;
 
 /**
  * 聚合Marker

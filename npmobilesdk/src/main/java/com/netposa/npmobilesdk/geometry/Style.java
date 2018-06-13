@@ -32,6 +32,10 @@ public class Style {
         return display;
     }
 
+    /**
+     *
+     * @param display none ""
+     */
     public void setDisplay(String display) {
         this.display = display;
     }

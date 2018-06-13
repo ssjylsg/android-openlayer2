@@ -96,6 +96,7 @@ public class NetPosaMap extends Entity {
         webSettings.setUseWideViewPort(true);
         webSettings.setLoadWithOverviewMode(true);
         webSettings.setJavaScriptEnabled(true);
+        webSettings.setDefaultTextEncodingName("utf-8");
         //webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         //webSettings.setGeolocationEnabled(true);
 
@@ -508,4 +509,19 @@ public class NetPosaMap extends Entity {
     public void searchRoad(String road,String netposaServer,PolylineStyle style) {
         this.ExecuteJs("searchRoad", road, netposaServer, style);
     }
+
+    public void hideScaleControl(){
+        this.ExecuteJs("hideScaleControl");
+    }
+    public void getResolutions(final  NPCallBackFunction<String[]> callBackFunction){
+        this.ExecuteJavaScripts("getResolutions",new CallBackFunction(){
+            @Override
+            public void onCallBack(String data) {
+                if(data != null && data.length() != 0 && callBackFunction != null){
+                    callBackFunction.onCallBack(data.split(","));
+                }
+            }
+        });
+    }
+
 }

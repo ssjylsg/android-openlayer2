@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>地图加载失败</title>
+</head>
+
+<body>
+    <div style="width: 100%;height: 100%;text-align: center;">
+        <div style="margin-top: 10px">
+        	<img src="404.jpg" width="205px" height="256px">
+        </div>
+        <span style="color: red" id="errorCode"></span>
+    </div>
+    <script type="text/javascript">
+    function getQueryString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]);
+        return null;
+    }
+
+    var errorCode = getQueryString('errorCode') || '地图加载失败！';
+    if(errorCode == '-2'){
+    	errorCode = '找不到该网址！';
+    }
+    document.getElementById("errorCode").innerText = decodeURIComponent(errorCode);
+    </script>
+</body>
+
+</html>

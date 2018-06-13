@@ -4,9 +4,13 @@ package com.netposa.npmobilesdk.geometry;
 public class LineStringStyle extends Style {
     private String graphicName = "triangle";
     private String strokeColor = "red";
+    private String fillColor ="";
     private Double strokeWidth = 2.0;
     private String strokeDashstyle = "solid";
     private Double pointRadius = 6.0;
+    private Double fillOpacity = 0.4;
+    private Double strokeOpacity = 1.0;
+
 
     public String getGraphicName() {
         return graphicName;
@@ -58,4 +62,27 @@ public class LineStringStyle extends Style {
 
     private String strokeLinecap = "'round";
 
+    public String getFillColor() {
+        return fillColor;
+    }
+
+    public void setFillColor(String fillColor) {
+        this.fillColor = fillColor;
+    }
+
+    public Double getFillOpacity() {
+        return fillOpacity;
+    }
+
+    public void setFillOpacity(Double fillOpacity) {
+        this.fillOpacity = fillOpacity;
+    }
+
+    public Double getStrokeOpacity() {
+        return strokeOpacity;
+    }
+
+    public void setStrokeOpacity(Double strokeOpacity) {
+        this.strokeOpacity = strokeOpacity;
+    }
 }
